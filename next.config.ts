@@ -1,7 +1,13 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  compiler: {
+    styledComponents: true,
+  },
+  reactStrictMode: true,
+  experimental: {
+    appDir: false, // Desactiva el "App Directory" y usa la estructura tradicional con "pages/"
+  },
 };
 
 export default nextConfig;
