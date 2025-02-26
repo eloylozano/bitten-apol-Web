@@ -4,6 +4,7 @@ import styled from "styled-components";
 import Center from "./Center";
 import PrimaryBtn from "./Button";
 import Button from "./Button";
+import ButtonLink from "./ButtonLink";
 
 const Bg = styled.div`
   background-color: #222;
@@ -51,7 +52,6 @@ interface FeaturedProps {
 }
 
 export default function Featured({ product }: FeaturedProps) {
-
   return (
     <Bg>
       <Center>
@@ -59,13 +59,11 @@ export default function Featured({ product }: FeaturedProps) {
           <Column>
             <div>
               <Title>{product?.title}</Title>
-              <Desc>
-                {product?.description}
-              </Desc>
+              <Desc>{product?.description}</Desc>
               <ButtonsWrapper>
-                <Button outline white>
+                <ButtonLink href={"/products/" + product._id} outline={1} white={1}>
                   Read more
-                </Button>
+                </ButtonLink>
                 <Button primary>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
