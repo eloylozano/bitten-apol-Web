@@ -26,8 +26,8 @@ const Wrapper = styled.div`
   grid-template-columns: 0.9fr 1.1fr;
   gap: 0px;
   img {
-    max-height: 100%;
-    height: 300px;
+    max-width: 100%;
+    width: 300px;
   }
 `;
 const Column = styled.div`
@@ -41,13 +41,16 @@ const ButtonsWrapper = styled.div`
   gap: 20px;
 `;
 
-export default function Featured({ product }) {
-  console.log("Producto en Featured:", product);  // Esto ayudará a confirmar si product es válido
+interface Product {
+  title: string;
+  description: string;
+}
 
-  if (!product) {
-    return <p>Producto no encontrado</p>;  // Si no hay producto, muestra un mensaje
-  }
-  const { title } = product;
+interface FeaturedProps {
+  product?: Product;
+}
+
+export default function Featured({ product }: FeaturedProps) {
 
   return (
     <Bg>
@@ -55,12 +58,9 @@ export default function Featured({ product }) {
         <Wrapper>
           <Column>
             <div>
-              <Title>{title}</Title>
+              <Title>{product?.title}</Title>
               <Desc>
-                Lorem ipsum, dolor sit amet consectetur adipisicing elit.
-                Architecto tempore deleniti autem dolor nemo quaerat facere.
-                Ratione, itaque nam accusamus consectetur nulla recusandae fugit
-                velit laboriosam dolores neque quae cupiditate.
+                {product?.description}
               </Desc>
               <ButtonsWrapper>
                 <Button outline white>
@@ -91,4 +91,3 @@ export default function Featured({ product }) {
     </Bg>
   );
 }
-
