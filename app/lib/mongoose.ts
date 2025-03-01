@@ -5,10 +5,6 @@ export function mongooseConnect() {
     return mongoose.connection.asPromise();
   } else {
     const uri = process.env.MONGODB_URI;
-    console.log("Mogo Uri:", uri)
-    if (!uri) {
-      throw new Error("MONGODB_URI is not defined");
-    }
     return mongoose.connect(uri);
   }
 }
