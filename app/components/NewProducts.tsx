@@ -26,20 +26,23 @@ const Title = styled.h2`
 const ProductsGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
-  gap: 20px;
-  padding-top: 20px;
+  gap: 30px;
+  padding-top: 30px;
 `;
 
 const NewProducts: React.FC<NewProductsProps> = ({ products }) => {
   return (
     <Center>
+      <Title>New Arrivals</Title>
       <ProductsGrid>
-        {products?.length > 0 && products.map(product => (
-          <ProductBox {...product} />
-        ))}
+        {products?.length > 0 &&
+          products.map((product) => (
+            <ProductBox images={[]} key={product._id} {...product} />
+          ))}
       </ProductsGrid>
     </Center>
   );
-}
+};
+
 
 export default NewProducts;
