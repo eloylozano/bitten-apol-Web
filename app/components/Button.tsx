@@ -6,6 +6,7 @@ interface ButtonProps {
   children: ReactNode;
   white?: boolean;
   grey?: boolean;
+  block?: boolean;
   outline?: boolean;
   primary?: boolean;
   size?: "s" | "m" | "l";
@@ -47,13 +48,12 @@ export const ButtonStyle = css<ButtonProps>`
 
     ${(props) =>
     props.grey &&
-    props.outline &&
     css`
-      background-color: transparent;
-      color: #252525;
+      background-color: #252525;
+      color: #fff;
       border: 1px solid #252525;
     `}
-
+  
 
   ${(props) =>
     props.primary &&
@@ -72,6 +72,12 @@ export const ButtonStyle = css<ButtonProps>`
       border: 1px solid ${primary};
       color: ${primary};
     `}
+  ${(props) =>
+    props.block &&
+    css`
+      display: block;
+    `}
+
 
   ${(props) =>
     props.size === "l" &&
@@ -82,7 +88,7 @@ export const ButtonStyle = css<ButtonProps>`
 `;
 
 export const StyledButton = styled.button.withConfig({
-  shouldForwardProp: (prop) => !["white", "outline", "grey", "primary", "size"].includes(prop as string),
+  shouldForwardProp: (prop) => !["white", "outline", "grey", "block", "primary", "size"].includes(prop as string),
 }) <ButtonProps>`
   ${ButtonStyle}
 `;
