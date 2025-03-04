@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import styled from "styled-components";
 
 const StyledDiv = styled.div`
@@ -7,6 +7,10 @@ const StyledDiv = styled.div`
   padding: 0 20px;
 `;
 
-export default function Center({ children }) {
-  return <StyledDiv>{children} </StyledDiv>;
+interface CenterProps {
+  children: ReactNode;
+}
+
+export default function Center({ children }: CenterProps) {
+  return <StyledDiv>{children}</StyledDiv>;
 }

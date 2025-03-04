@@ -7,6 +7,7 @@ import ButtonLink from "./ButtonLink";
 import CartIcon from "./icons/CartIcon";
 import { CartContext } from "./CartContext";
 import { useContext } from "react";
+import Title from "./Title";
 
 const Bg = styled.div`
   background-color: #222;
@@ -14,11 +15,6 @@ const Bg = styled.div`
   padding: 50px 0;
 `;
 
-const Title = styled.h1`
-  margin: 0;
-  font-weight: normal;
-  font-size: 3rem;
-`;
 
 const Desc = styled.p`
   color: #aaa;
