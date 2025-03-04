@@ -21,8 +21,32 @@ const Box = styled.div`
     padding: 30px;
 `;
 
+const ProductInfoCell = styled.td`
+    padding: 15px 0;
+`;
+
+const ProductImageBox = styled.div`
+    width: 100px;
+    height: 100px;
+    padding: 0px;
+    border: 1px solid rgb(0, 0, 0, .1);
+    background-color: #fff;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    img{
+        max-width: 80px;
+        max-height: 80px;
+    }
+`;
+
+const QuantityLabel = styled.span`
+    padding: 0 3px;
+`
+
 export default function CartPage() {
-    const { cartProducts } = useCart();
+    const { cartProducts, addProduct, removeProduct } = useCart();
     const [products, setProducts] = useState([]);
 
     useEffect(() => {
@@ -39,6 +63,13 @@ export default function CartPage() {
         }
     }, [cartProducts]);
 
+    function moreOfThisProduct(id) {
+        addProduct(id);
+    }
+    function lessOfThisProduct(id) {
+        removeProduct(id);
+    }
+
     return (
         <>
             <Header />
@@ -54,6 +85,7 @@ export default function CartPage() {
                             <Table>
                                 <thead>
                                     <tr>
+                                        <th></th>
                                         <th>Product</th>
                                         <th>Quantity</th>
                                         <th>Price</th>
@@ -62,14 +94,29 @@ export default function CartPage() {
                                 <tbody>
                                     {products.map(product => (
                                         <tr key={product._id}>
-                                            <td>
-                                                <img src={product.images[0]} alt={product.title} style={{ width: '50px', height: '50px' }} />
-                                            </td>
+                                            <ProductInfoCell>
+                                                <ProductImageBox>
+                                                    <img src={product.images[0]} alt={product.title} />
+                                                </ProductImageBox>
+                                            </ProductInfoCell>
                                             <td>{product.title}</td>
                                             <td>
-                                                {cartProducts.filter(id => id === product._id).length}
+                                                <Button onClick={() => lessOfThisProduct(product._id)}>
+                                                    -
+                                                </Button>
+
+                                                <QuantityLabel>
+                                                    {cartProducts.filter(id => id === product._id).length}
+                                                </QuantityLabel>
+
+                                                <Button
+                                                    onClick={() => moreOfThisProduct(product._id)}>
+                                                    +
+                                                </Button>
                                             </td>
-                                            <td>${product.price}</td>
+                                            <td>
+                                                {cartProducts.filter(id => id === product._id).length * product.price} €
+                                            </td>
                                         </tr>
                                     ))}
                                 </tbody>

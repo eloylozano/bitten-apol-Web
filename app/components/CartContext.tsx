@@ -30,21 +30,26 @@ export function CartContextProvider({ children }: { children: ReactNode }) {
         }
     }, []);
 
-    // Guardar el carrito en localStorage cuando cambie
     useEffect(() => {
         localStorage.setItem('cart', JSON.stringify(cartProducts));
     }, [cartProducts]);
 
-    // Añadir un producto al carrito
     function addProduct(productId: string) {
         setCartProducts((prev) => [...prev, productId]);
     }
 
-    // Eliminar un producto del carrito
     function removeProduct(productId: string) {
-        setCartProducts((prev) => prev.filter(id => id !== productId));
+        setCartProducts(prev => {
+            const pos = prev.indexOf(productId);
+            if (pos !== -1) {
+                return prev.filter((value, index) => index !== pos);
+            }
+            return prev;
+        });
     }
-
+    function clearCart() {
+        setCartProducts([]);
+    }
     return (
         <CartContext.Provider value={{ cartProducts, setCartProducts, addProduct, removeProduct }}>
             {children}
