@@ -1,4 +1,6 @@
+
 import Featured from "./components/Featured";
+import Footer from "./components/Footer";
 import Header from "./components/Header";
 import NewProducts from "./components/NewProducts";
 import { mongooseConnect } from "./lib/mongoose";
@@ -17,6 +19,7 @@ export default async function HomePage() {
       <Header />
       <Featured product={featuredProduct} />
       <NewProducts products={newProducts} />
+      <Footer />
     </div>
   );
 }

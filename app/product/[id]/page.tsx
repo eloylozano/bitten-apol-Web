@@ -13,12 +13,13 @@ import styled from "styled-components";
 import React from "react";
 import { SyncLoader } from "react-spinners";
 import NewProducts from "@/app/components/NewProducts";
+import Footer from "@/app/components/Footer";
 
 const ColWrapper = styled.div`
   display: grid;
   grid-template-columns: 1fr;
   @media screen and (min-width: 768px) {
-    grid-template-columns: .8fr 1.2fr;
+    grid-template-columns: 0.8fr 1.2fr;
   }
   gap: 40px;
   margin: 40px 0;
@@ -40,7 +41,7 @@ const ProductInfo = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-`
+`;
 
 interface Product {
   _id: string;
@@ -50,7 +51,11 @@ interface Product {
   images: string[];
 }
 
-export default function ProductPage({ params }: { params: Promise<{ id: string }> }) {
+export default function ProductPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = React.use(params);
 
   const { addProduct } = useCart();
@@ -65,7 +70,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
     }
 
     async function fetchRecentProducts() {
-      const response = await fetch('http://localhost:3000/api/products'); // Ajusta la URL según sea necesario
+      const response = await fetch("http://localhost:3000/api/products"); // Ajusta la URL según sea necesario
       const data: Product[] = await response.json();
       setRecentProducts(data.slice(0, 12)); // Solo toma los primeros 12 productos
     }
@@ -107,6 +112,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
         {/* Mostrar solo los primeros 12 productos recientes */}
         <NewProducts products={recentProducts} />
       </Center>
+      <Footer />
     </>
   );
 }

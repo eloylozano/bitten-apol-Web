@@ -1,42 +1,43 @@
-"use client"
-import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
-import Center from '../components/Center';
-import Header from '../components/Header';
-import Button from '../components/Button';
-import { useCart } from '../components/CartContext';  // Usamos el hook `useCart`
-import axios from 'axios';
-import Table from '../components/Table';
-import Input from '../components/Input';
+"use client";
+import React, { useEffect, useState } from "react";
+import styled from "styled-components";
+import Center from "../components/Center";
+import Header from "../components/Header";
+import Button from "../components/Button";
+import { useCart } from "../components/CartContext"; // Usamos el hook `useCart`
+import axios from "axios";
+import Table from "../components/Table";
+import Input from "../components/Input";
+import Footer from "../components/Footer";
 
 interface Product {
-    _id: string;
-    title: string;
-    images: string[];
-    price: number;
+  _id: string;
+  title: string;
+  images: string[];
+  price: number;
 }
 
 const ColumnsWrapper = styled.div`
-    display: grid;
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  @media screen and (min-width: 768px) {
     grid-template-columns: 1.2fr 0.8fr;
-    @media screen and (min-width: 768px) {
-        grid-template-columns: 1.2fr .8fr;
-    }
-    gap: 40px;
-    margin-top: 40px;
+  }
+  gap: 40px;
+  margin-top: 40px;
 `;
 
 const Box = styled.div`
-    background-color: #fff;
-    border-radius: 10px;
-    padding: 30px;
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 30px;
 `;
 
 const ProductInfoCell = styled.td`
-    padding: 15px 0;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  padding: 15px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 `;
 
 const ProductImageBox = styled.div`
@@ -73,187 +74,209 @@ const QuantityLabel = styled.span`
 `;
 
 const CityHolder = styled.div`
-  display:flex;
+  display: flex;
   gap: 5px;
 `;
 export default function CartPage() {
-    const { cartProducts, addProduct, removeProduct } = useCart();
-    const [products, setProducts] = useState<Product[]>([]);
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [city, setCity] = useState('');
-    const [postalCode, setPostalCode] = useState('');
-    const [streetAddress, setStreetAddress] = useState('');
-    const [country, setCountry] = useState('');
-    const [isSuccess, setIsSuccess] = useState(false);
+  const { cartProducts, addProduct, removeProduct } = useCart();
+  const [products, setProducts] = useState<Product[]>([]);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [city, setCity] = useState("");
+  const [postalCode, setPostalCode] = useState("");
+  const [streetAddress, setStreetAddress] = useState("");
+  const [country, setCountry] = useState("");
+  const [isSuccess, setIsSuccess] = useState(false);
 
-    useEffect(() => {
-        if (cartProducts.length > 0) {
-            axios.post('/api/cart', { ids: cartProducts })
-                .then(response => {
-                    setProducts(response.data);
-                })
-                .catch(error => {
-                    console.error('Error fetching products:', error);
-                });
-        } else {
-            setProducts([]);
-        }
-    }, [cartProducts]);
-
-    function moreOfThisProduct(id: any) {
-        addProduct(id);
-    }
-
-    function lessOfThisProduct(id: any) {
-        removeProduct(id);
-    }
-
-    async function goToPayment() {
-        const response = await axios.post('/api/checkout', {
-            name, email, city, postalCode, streetAddress, country,
-            cartProducts,
+  useEffect(() => {
+    if (cartProducts.length > 0) {
+      axios
+        .post("/api/cart", { ids: cartProducts })
+        .then((response) => {
+          setProducts(response.data);
+        })
+        .catch((error) => {
+          console.error("Error fetching products:", error);
         });
-        if (response.data.url) {
-            window.location = response.data.url;
-        }
+    } else {
+      setProducts([]);
     }
+  }, [cartProducts]);
 
-    let total = 0;
-    for (const productId of cartProducts) {
-        const price = products.find(p => p._id === productId)?.price || 0;
-        total += price;
+  function moreOfThisProduct(id: any) {
+    addProduct(id);
+  }
+
+  function lessOfThisProduct(id: any) {
+    removeProduct(id);
+  }
+
+  async function goToPayment() {
+    const response = await axios.post("/api/checkout", {
+      name,
+      email,
+      city,
+      postalCode,
+      streetAddress,
+      country,
+      cartProducts,
+    });
+    if (response.data.url) {
+      window.location = response.data.url;
     }
+  }
 
+  let total = 0;
+  for (const productId of cartProducts) {
+    const price = products.find((p) => p._id === productId)?.price || 0;
+    total += price;
+  }
 
-    if (isSuccess) {
-        return (
-            <>
-                <Header />
-                <Center>
-                    <ColumnsWrapper>
-                        <Box>
-                            <h1>Thanks for your order!</h1>
-                            <p>We will email you when your order will be sent.</p>
-                        </Box>
-                    </ColumnsWrapper>
-                </Center>
-            </>
-        );
-    }
+  if (isSuccess) {
     return (
-        <>
-            <Header />
-            <Center>
-                <ColumnsWrapper>
-                    <Box>
-                        <h2>Cart</h2>
-                        {cartProducts?.length === 0 ? (
-                            <div>Your cart is empty</div>
-                        ) : products?.length === 0 ? (
-                            <div>Loading products...</div>
-                        ) : (
-                            <Table>
-                                <thead>
-                                    <tr>
-                                        <th>Product</th>
-                                        <th>Quantity</th>
-                                        <th>Price</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {products.map(product => (
-                                        <tr key={product._id}>
-                                            <ProductInfoCell>
-                                                <ProductImageBox>
-                                                    <img src={product.images[0]} alt={product.title} />
-                                                </ProductImageBox>
-                                                {product.title}
-                                            </ProductInfoCell>
-                                            <td>
-                                                <Button onClick={() => lessOfThisProduct(product._id)}>
-                                                    -
-                                                </Button>
-
-                                                <QuantityLabel>
-                                                    {cartProducts.filter(id => id === product._id).length}
-                                                </QuantityLabel>
-
-                                                <Button
-                                                    onClick={() => moreOfThisProduct(product._id)}>
-                                                    +
-                                                </Button>
-                                            </td>
-                                            <td>
-                                                {cartProducts.filter(id => id === product._id).length * product.price} €
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td>{total} €</td>
-                                    </tr>
-                                </tbody>
-                            </Table>
-                        )}
-
-                    </Box>
-                    {!!cartProducts?.length && (
-                        <Box>
-                            <h2>Order Information</h2>
-                            <form action="/api/checkout" method="post">
-                                <Input
-                                    type="text"
-                                    placeholder="Name"
-                                    value={name}
-                                    name="name"
-                                    onChange={(ev: React.ChangeEvent<HTMLInputElement>) => setName(ev.target.value)}
-                                />
-                                <Input
-                                    type="text"
-                                    placeholder="Email"
-                                    value={email}
-                                    name="email"
-                                    onChange={(ev: React.ChangeEvent<HTMLInputElement>) => setEmail(ev.target.value)}
-                                />
-                                <CityHolder>
-                                    <Input
-                                        type="text"
-                                        placeholder="City"
-                                        value={city}
-                                        name="city"
-                                        onChange={(ev: React.ChangeEvent<HTMLInputElement>) => setCity(ev.target.value)}
-                                    />
-                                    <Input
-                                        type="text"
-                                        placeholder="Postal Code"
-                                        value={postalCode}
-                                        name="postalCode"
-                                        onChange={(ev: React.ChangeEvent<HTMLInputElement>) => setPostalCode(ev.target.value)}
-                                    />
-                                </CityHolder>
-                                <Input
-                                    type="text"
-                                    placeholder="Street Address"
-                                    value={streetAddress}
-                                    name="streetAddress"
-                                    onChange={(ev: React.ChangeEvent<HTMLInputElement>) => setStreetAddress(ev.target.value)}
-                                />
-                                <Input
-                                    type="text"
-                                    placeholder="Country"
-                                    value={country}
-                                    name="country"
-                                    onChange={(ev: React.ChangeEvent<HTMLInputElement>) => setCountry(ev.target.value)}
-                                />
-                                <Button grey block onClick={goToPayment}>Continue to payment</Button>
-                            </form>
-
-                        </Box>
-                    )}
-                </ColumnsWrapper>
-            </Center>
-        </>
+      <>
+        <Header />
+        <Center>
+          <ColumnsWrapper>
+            <Box>
+              <h1>Thanks for your order!</h1>
+              <p>We will email you when your order will be sent.</p>
+            </Box>
+          </ColumnsWrapper>
+        </Center>
+      </>
     );
+  }
+  return (
+    <>
+      <Header />
+      <Center>
+        <ColumnsWrapper>
+          <Box>
+            <h2>Cart</h2>
+            {cartProducts?.length === 0 ? (
+              <div>Your cart is empty</div>
+            ) : products?.length === 0 ? (
+              <div>Loading products...</div>
+            ) : (
+              <Table>
+                <thead>
+                  <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {products.map((product) => (
+                    <tr key={product._id}>
+                      <ProductInfoCell>
+                        <ProductImageBox>
+                          <img src={product.images[0]} alt={product.title} />
+                        </ProductImageBox>
+                        {product.title}
+                      </ProductInfoCell>
+                      <td>
+                        <Button onClick={() => lessOfThisProduct(product._id)}>
+                          -
+                        </Button>
+
+                        <QuantityLabel>
+                          {
+                            cartProducts.filter((id) => id === product._id)
+                              .length
+                          }
+                        </QuantityLabel>
+
+                        <Button onClick={() => moreOfThisProduct(product._id)}>
+                          +
+                        </Button>
+                      </td>
+                      <td>
+                        {cartProducts.filter((id) => id === product._id)
+                          .length * product.price}{" "}
+                        €
+                      </td>
+                    </tr>
+                  ))}
+                  <tr>
+                    <td></td>
+                    <td></td>
+                    <td>{total} €</td>
+                  </tr>
+                </tbody>
+              </Table>
+            )}
+          </Box>
+          {!!cartProducts?.length && (
+            <Box>
+              <h2>Order Information</h2>
+              <form action="/api/checkout" method="post">
+                <Input
+                  type="text"
+                  placeholder="Name"
+                  value={name}
+                  name="name"
+                  onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
+                    setName(ev.target.value)
+                  }
+                />
+                <Input
+                  type="text"
+                  placeholder="Email"
+                  value={email}
+                  name="email"
+                  onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
+                    setEmail(ev.target.value)
+                  }
+                />
+                <CityHolder>
+                  <Input
+                    type="text"
+                    placeholder="City"
+                    value={city}
+                    name="city"
+                    onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
+                      setCity(ev.target.value)
+                    }
+                  />
+                  <Input
+                    type="text"
+                    placeholder="Postal Code"
+                    value={postalCode}
+                    name="postalCode"
+                    onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
+                      setPostalCode(ev.target.value)
+                    }
+                  />
+                </CityHolder>
+                <Input
+                  type="text"
+                  placeholder="Street Address"
+                  value={streetAddress}
+                  name="streetAddress"
+                  onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
+                    setStreetAddress(ev.target.value)
+                  }
+                />
+                <Input
+                  type="text"
+                  placeholder="Country"
+                  value={country}
+                  name="country"
+                  onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
+                    setCountry(ev.target.value)
+                  }
+                />
+                <Button grey block onClick={goToPayment}>
+                  Continue to payment
+                </Button>
+              </form>
+            </Box>
+          )}
+        </ColumnsWrapper>
+      </Center>
+      <Footer />
+    </>
+  );
 }

@@ -5,6 +5,7 @@ import Header from "../components/Header";
 import Center from "../components/Center";
 import ProductsGrid from "../components/ProductsGrid";
 import Title from "../components/Title";
+import Footer from "../components/Footer";
 
 export default function ProductsPage() {
   const [products, setProducts] = useState([]);
@@ -23,6 +24,7 @@ export default function ProductsPage() {
         <Title>All products</Title>
         <ProductsGrid products={products} />
       </Center>
+      <Footer />
     </>
   );
 }
