@@ -301,7 +301,7 @@ export default function CartPage() {
                       setCountry(ev.target.value)
                     }
                   />
-                  <Button grey block onClick={goToPayment}>
+                  <Button grey="true" block="true" onClick={goToPayment}>
                   Continue to payment
                 </Button>
                 </form>
