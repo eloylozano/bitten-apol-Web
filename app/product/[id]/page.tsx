@@ -14,6 +14,7 @@ import React from "react";
 import { SyncLoader } from "react-spinners";
 import NewProducts from "@/app/components/NewProducts";
 import Footer from "@/app/components/Footer";
+import { useRouter } from "next/navigation"; // Para redirigir
 
 const ColWrapper = styled.div`
   display: grid;
@@ -62,6 +63,8 @@ export default function ProductPage({
   const [product, setProduct] = useState<Product | null>(null);
   const [recentProducts, setRecentProducts] = useState<Product[]>([]);
   const [isAdded, setIsAdded] = useState(false);  // Estado para el feedback de añadir al carrito
+  const [user, setUser] = useState<any>(null); // Estado para el usuario autenticado
+  const router = useRouter(); // Para redirigir
 
   useEffect(() => {
     async function fetchProduct() {
@@ -76,11 +79,25 @@ export default function ProductPage({
       setRecentProducts(data.slice(0, 12));
     }
 
+    async function checkUserSession() {
+      const response = await fetch("/api/auth/me"); // Ajusta la URL según sea necesario
+      if (response.status === 200) {
+        const data = await response.json();
+        setUser(data); // Guarda el usuario si está autenticado
+      }
+    }
+
     fetchProduct();
     fetchRecentProducts();
+    checkUserSession();
   }, [id]);
 
   const handleAddToCart = (productId: string) => {
+    if (!user) { // Verifica si el usuario está autenticado
+      router.push("/login"); // Redirige al login si no está autenticado
+      return;
+    }
+
     addProduct(productId);
     setIsAdded(true);  // Muestra el feedback visual
     setTimeout(() => setIsAdded(false), 2000);  // Restablece el feedback después de 2 segundos
@@ -113,7 +130,7 @@ export default function ProductPage({
                   onClick={() => handleAddToCart(product._id)}
                 >
                   <CartIcon />{" "}
-                  {isAdded ? "Added to cart" : "Add to cart"} {/* Feedback visual */}
+                  {isAdded ? "Added to cart" : "Add to cart"}
                 </Button>
               </div>
             </PriceRow>
