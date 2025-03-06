@@ -12,8 +12,10 @@ const Image = styled.img`
 `;
 
 const BigImage = styled.img`
-  max-width: 100%;
-  max-height: 200px;
+  width: 100%;
+  margin: 0 auto;
+  height: 100%;
+  object-fit: contain; 
 `;
 
 const ImageButtons = styled.div`
@@ -37,6 +39,7 @@ const ImageButton = styled.div<ImageButtonProps>`
 
 const BigImageWrapper = styled.div`
   text-align: center;
+  height: 300px; 
 `;
 
 const ProductImages: React.FC<ProductImagesProps> = ({ images }) => {

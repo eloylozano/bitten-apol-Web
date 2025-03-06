@@ -12,6 +12,7 @@ import WhiteBox from "../../components/WhiteBox";
 import styled from "styled-components";
 import React from "react";
 import { SyncLoader } from "react-spinners";
+import NewProducts from "@/app/components/NewProducts";
 
 const ColWrapper = styled.div`
   display: grid;
@@ -54,6 +55,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
 
   const { addProduct } = useCart();
   const [product, setProduct] = useState<Product | null>(null);
+  const [recentProducts, setRecentProducts] = useState<Product[]>([]);
 
   useEffect(() => {
     async function fetchProduct() {
@@ -62,13 +64,18 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
       setProduct(data);
     }
 
+    async function fetchRecentProducts() {
+      const response = await fetch('http://localhost:3000/api/products'); // Ajusta la URL según sea necesario
+      const data: Product[] = await response.json();
+      setRecentProducts(data.slice(0, 12)); // Solo toma los primeros 12 productos
+    }
+
     fetchProduct();
+    fetchRecentProducts();
   }, [id]);
 
   if (!product) {
-    return <>
-      <SyncLoader></SyncLoader>
-    </>;
+    return <SyncLoader />;
   }
 
   return (
@@ -81,8 +88,8 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
           </WhiteBox>
           <ProductInfo>
             <div>
-            <Title>{product.title}</Title>
-            <p>{product.description}</p>
+              <Title>{product.title}</Title>
+              <p>{product.description}</p>
             </div>
             <PriceRow>
               <div>
@@ -90,12 +97,15 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
               </div>
               <div>
                 <Button primary={true} onClick={() => addProduct(product._id)}>
-                  <CartIcon />Add to cart
+                  <CartIcon /> Add to cart
                 </Button>
               </div>
             </PriceRow>
           </ProductInfo>
         </ColWrapper>
+
+        {/* Mostrar solo los primeros 12 productos recientes */}
+        <NewProducts products={recentProducts} />
       </Center>
     </>
   );
