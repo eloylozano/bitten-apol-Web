@@ -10,6 +10,8 @@ import ProductImages from "../../components/ProductImages";
 import Title from "../../components/Title";
 import WhiteBox from "../../components/WhiteBox";
 import styled from "styled-components";
+import React from "react";
+import { SyncLoader } from "react-spinners";
 
 const ColWrapper = styled.div`
   display: grid;
@@ -23,13 +25,21 @@ const ColWrapper = styled.div`
 
 const PriceRow = styled.div`
   display: flex;
+  flex-direction: column;
   gap: 20px;
-  align-items: center;
+  align-items: end;
 `;
 
 const Price = styled.span`
-  font-size: 1.4rem;
+  font-size: 2rem;
+  font-weight: bold;
 `;
+
+const ProductInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+`
 
 interface Product {
   _id: string;
@@ -39,8 +49,9 @@ interface Product {
   images: string[];
 }
 
-export default function ProductPage({ params }: { params: { id: string } }) {
-  const { id } = params;
+export default function ProductPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = React.use(params);
+
   const { addProduct } = useCart();
   const [product, setProduct] = useState<Product | null>(null);
 
@@ -55,7 +66,9 @@ export default function ProductPage({ params }: { params: { id: string } }) {
   }, [id]);
 
   if (!product) {
-    return <div>Loading...</div>;
+    return <>
+      <SyncLoader></SyncLoader>
+    </>;
   }
 
   return (
@@ -66,20 +79,22 @@ export default function ProductPage({ params }: { params: { id: string } }) {
           <WhiteBox>
             <ProductImages images={product.images} />
           </WhiteBox>
-          <div>
+          <ProductInfo>
+            <div>
             <Title>{product.title}</Title>
             <p>{product.description}</p>
+            </div>
             <PriceRow>
               <div>
-                <Price>${product.price}</Price>
+                <Price>{product.price} €</Price>
               </div>
               <div>
-                <Button primary onClick={() => addProduct(product._id)}>
+                <Button primary={true} onClick={() => addProduct(product._id)}>
                   <CartIcon />Add to cart
                 </Button>
               </div>
             </PriceRow>
-          </div>
+          </ProductInfo>
         </ColWrapper>
       </Center>
     </>

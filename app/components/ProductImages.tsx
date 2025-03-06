@@ -1,5 +1,3 @@
-"use client";
-
 import styled from "styled-components";
 import { useState } from "react";
 
@@ -26,16 +24,11 @@ const ImageButtons = styled.div`
 `;
 
 interface ImageButtonProps {
-  active: boolean;
+  $active: boolean; // Usar un prefijo como `$` para evitar pasar el atributo al DOM
 }
 
 const ImageButton = styled.div<ImageButtonProps>`
-  border: 2px solid #ccc;
-  ${props => props.active ? `
-    border-color: #ccc;
-  ` : `
-    border-color: transparent;
-  `}
+  border: 2px solid ${props => (props.$active ? "#ccc" : "transparent")};
   height: 40px;
   padding: 2px;
   cursor: pointer;
@@ -58,7 +51,7 @@ const ProductImages: React.FC<ProductImagesProps> = ({ images }) => {
         {images.map(image => (
           <ImageButton
             key={image}
-            active={image === activeImage}
+            $active={image === activeImage} // Usar `$active` en lugar de `active`
             onClick={() => setActiveImage(image)}
           >
             <Image src={image} alt={`Thumbnail of ${image}`} />
