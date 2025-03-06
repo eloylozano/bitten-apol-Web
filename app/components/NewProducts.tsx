@@ -21,13 +21,29 @@ const Title = styled.h2`
   font-size: 2rem;
   margin: 30px 0 20px;
   font-weight: normal;
+  text-align: center;
 `;
 
 const ProductsGrid = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-columns: repeat(4, 1fr); /* 4 columnas por defecto */
   gap: 30px;
   padding-top: 30px;
+
+  /* Responsividad para pantallas medianas (tabletas) */
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(3, 1fr); /* 3 columnas para pantallas medianas */
+  }
+
+  /* Responsividad para pantallas pequeñas (móviles) */
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr); /* 2 columnas para móviles */
+  }
+
+  /* Responsividad para pantallas extra pequeñas (móviles más pequeños) */
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr; /* 1 columna para pantallas más pequeñas */
+  }
 `;
 
 const NewProducts: React.FC<NewProductsProps> = ({ products }) => {
@@ -43,6 +59,5 @@ const NewProducts: React.FC<NewProductsProps> = ({ products }) => {
     </Center>
   );
 };
-
 
 export default NewProducts;

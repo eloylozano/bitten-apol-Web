@@ -26,7 +26,7 @@ const ProductsGrid: React.FC<ProductsGridProps> = ({ products }) => {
         <StyledProductsGrid>
             {products?.length > 0 &&
                 products.map((product) => (
-                    <ProductBox key={product._id} {...product} />
+                    <ProductBox images={[]} key={product._id} {...product} />
                 ))}
         </StyledProductsGrid>
     );
