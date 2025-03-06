@@ -61,6 +61,7 @@ export default function ProductPage({
   const { addProduct } = useCart();
   const [product, setProduct] = useState<Product | null>(null);
   const [recentProducts, setRecentProducts] = useState<Product[]>([]);
+  const [isAdded, setIsAdded] = useState(false);  // Estado para el feedback de añadir al carrito
 
   useEffect(() => {
     async function fetchProduct() {
@@ -70,14 +71,20 @@ export default function ProductPage({
     }
 
     async function fetchRecentProducts() {
-      const response = await fetch("http://localhost:3000/api/products"); // Ajusta la URL según sea necesario
+      const response = await fetch("http://localhost:3000/api/products");
       const data: Product[] = await response.json();
-      setRecentProducts(data.slice(0, 12)); // Solo toma los primeros 12 productos
+      setRecentProducts(data.slice(0, 12));
     }
 
     fetchProduct();
     fetchRecentProducts();
   }, [id]);
+
+  const handleAddToCart = (productId: string) => {
+    addProduct(productId);
+    setIsAdded(true);  // Muestra el feedback visual
+    setTimeout(() => setIsAdded(false), 2000);  // Restablece el feedback después de 2 segundos
+  };
 
   if (!product) {
     return <SyncLoader />;
@@ -101,15 +108,18 @@ export default function ProductPage({
                 <Price>{product.price} €</Price>
               </div>
               <div>
-                <Button primary={true} onClick={() => addProduct(product._id)}>
-                  <CartIcon /> Add to cart
+                <Button
+                  primary={true}
+                  onClick={() => handleAddToCart(product._id)}
+                >
+                  <CartIcon />{" "}
+                  {isAdded ? "Added to cart" : "Add to cart"} {/* Feedback visual */}
                 </Button>
               </div>
             </PriceRow>
           </ProductInfo>
         </ColWrapper>
 
-        {/* Mostrar solo los primeros 12 productos recientes */}
         <NewProducts products={recentProducts} />
       </Center>
       <Footer />

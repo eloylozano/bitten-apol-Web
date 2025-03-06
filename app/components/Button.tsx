@@ -88,8 +88,13 @@ export const ButtonStyle = css<ButtonProps>`
 `;
 
 export const StyledButton = styled.button.withConfig({
-  shouldForwardProp: (prop) => !["white", "outline", "grey", "block", "primary", "size"].includes(prop as string),
-}) <ButtonProps>`
+
+  
+  shouldForwardProp: (prop) =>
+    !["white", "outline", "grey", "block", "primary", "size"].includes(
+      prop as string
+    ),
+})<ButtonProps>`
   ${ButtonStyle}
 `;
 
