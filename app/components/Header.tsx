@@ -4,6 +4,7 @@ import Link from "next/link";
 import { styled } from "styled-components";
 import Center from "./Center";
 import { useCart } from "./CartContext";
+import path from "path";
 
 // Estilos del Header
 const StyledHeader = styled.header`
@@ -104,12 +105,11 @@ export default function Header() {
             <NavLink href={"/"}>Home</NavLink>
             <NavLink href={"/products"}>Products</NavLink>
             <NavLink href={"/categories"}>Categories</NavLink>
-            <NavLink href={"/account"}>Account</NavLink>
             <NavLink href={"/cart"}>
               Cart <CartCount>{cartProducts.length}</CartCount>
             </NavLink>
 
-            <NavLink href="/login">
+            <NavLink href="/account">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
