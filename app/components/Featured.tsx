@@ -2,12 +2,12 @@
 
 import styled from "styled-components";
 import Center from "./Center";
-import Button from "./Button";
 import ButtonLink from "./ButtonLink";
 import CartIcon from "./icons/CartIcon";
 import { CartContext } from "./CartContext";
 import { useContext } from "react";
 import Title from "./Title";
+import CartButton from "./CartButton";
 
 const Bg = styled.div`
   background-color: #222;
@@ -25,13 +25,20 @@ const Wrapper = styled.div`
   display: grid;
   grid-template-columns: 0.9fr 1.1fr;
   gap: 0px;
+  
   img {
     max-width: 100%;
     max-height: 200px;
     display: block;
     margin: 0 auto;
   }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
 `;
+
 
 const Column = styled.div`
   display: flex;
@@ -82,10 +89,10 @@ export default function Featured({ product }: FeaturedProps) {
                 <ButtonLink href={`/product/${product?._id}`} outline={1} white={1}>
                   Read more
                 </ButtonLink>
-                <Button primary onClick={addFeaturedToCart}>
+                <CartButton primary onClick={addFeaturedToCart}>
                   <CartIcon />
                   Add to cart
-                </Button>
+                </CartButton>
               </ButtonsWrapper>
             </div>
           </Column>

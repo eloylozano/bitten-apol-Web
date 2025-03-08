@@ -25,9 +25,9 @@ const Wrapper = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 10px 20px;
+
   @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: flex-start;
+    flex-direction: row; /* Mantiene los elementos en fila */
   }
 `;
 
@@ -59,8 +59,10 @@ const MobileMenuButton = styled.button`
   color: white;
   font-size: 1.5em;
   display: none;
+  margin-left: auto; /* Lo empuja a la derecha */
+
   @media (max-width: 768px) {
-    display: block; /* Mostrar el botón en móviles */
+    display: block;
   }
 `;
 

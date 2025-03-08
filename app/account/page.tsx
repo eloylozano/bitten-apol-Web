@@ -1,4 +1,4 @@
-"use client";  // Directiva para marcar este archivo como cliente
+"use client"
 
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -10,15 +10,20 @@ interface User {
 }
 
 const AccountPage = () => {
-  const [user, setUser] = useState<User | null>(null); // Especificar el tipo
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     const checkUserSession = async () => {
-      const res = await axios.get("/api/auth/me");
-      if (res.status === 200) {
-        setUser(res.data);
-      } else {
-        window.location.href = "/login"; // Redirige a la página de login si no está logeado
+      try {
+        const res = await axios.get("/api/auth/me");
+
+        if (res.status === 200) {
+          setUser(res.data);
+        } else {
+          window.location.href = "/login"; // Redirige si la sesión no es válida
+        }
+      } catch (error) {
+        window.location.href = "/login"; // Redirige si hay error
       }
     };
 

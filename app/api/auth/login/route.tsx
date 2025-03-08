@@ -26,9 +26,7 @@ export async function POST(req: Request) {
 
     // Crear cookie de sesión correctamente
     const cookieStore = await cookies();
-    cookieStore.set({
-      name: "userSession",
-      value: user._id.toString(),
+    cookieStore.set("userSession", user._id.toString(), {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
