@@ -1,50 +1,43 @@
 import bcrypt from "bcryptjs";
-import { serialize } from "cookie";
-import User from "../../../models/User";
-import { NextApiRequest, NextApiResponse } from "next";
+import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
 import { mongooseConnect } from "@/app/lib/mongoose";
+import User from "@/app/models/User";
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-  if (req.method === "POST") {
-    const { email, password } = req.body;
+export async function POST(req: Request) {
+  await mongooseConnect();
+
+  try {
+    const { email, password } = await req.json();
 
     if (!email || !password) {
-      return res.status(400).json({ message: "All fields are required" });
+      return NextResponse.json({ message: "All fields are required" }, { status: 400 });
     }
 
-    try {
-      await mongooseConnect();
-
-      const user = await User.findOne({ email });
-      if (!user) {
-        return res.status(401).json({ message: "Invalid credentials" });
-      }
-
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) {
-        return res.status(401).json({ message: "Invalid credentials" });
-      }
-
-      // Crear cookie de sesión
-      res.setHeader(
-        "Set-Cookie",
-        serialize("userSession", user._id.toString(), {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production", // Solo en producción
-          sameSite: "strict",
-          maxAge: 60 * 60 * 24 * 7, // 1 semana
-          path: "/",
-        })
-      );
-
-      res.status(200).json({ message: "Login successful", user });
-    } catch (error) {
-      res.status(500).json({ message: "Server error" });
+    const user = await User.findOne({ email });
+    if (!user) {
+      return NextResponse.json({ message: "Invalid credentials" }, { status: 401 });
     }
-  } else {
-    res.status(405).json({ message: "Method not allowed" });
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return NextResponse.json({ message: "Invalid credentials" }, { status: 401 });
+    }
+
+    // Crear cookie de sesión correctamente
+    const cookieStore = await cookies();
+    cookieStore.set({
+      name: "userSession",
+      value: user._id.toString(),
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 60 * 60 * 24 * 7, // 1 semana
+      path: "/",
+    });
+
+    return NextResponse.json({ message: "Login successful", user }, { status: 200 });
+  } catch (error) {
+    return NextResponse.json({ message: "Server error" }, { status: 500 });
   }
 }
