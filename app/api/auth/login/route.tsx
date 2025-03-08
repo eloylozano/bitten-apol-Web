@@ -1,9 +1,8 @@
 import bcrypt from "bcryptjs";
-import cookie from "cookie";
+import { serialize } from "cookie";
 import User from "../../../models/User";
 import { NextApiRequest, NextApiResponse } from "next";
 import { mongooseConnect } from "@/app/lib/mongoose";
-import mongoose from "mongoose";
 
 export default async function handler(
   req: NextApiRequest,
@@ -32,7 +31,7 @@ export default async function handler(
       // Crear cookie de sesión
       res.setHeader(
         "Set-Cookie",
-        cookie.serialize("userSession", user._id.toString(), {
+        serialize("userSession", user._id.toString(), {
           httpOnly: true,
           secure: process.env.NODE_ENV === "production", // Solo en producción
           sameSite: "strict",
