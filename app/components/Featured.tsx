@@ -7,14 +7,13 @@ import CartIcon from "./icons/CartIcon";
 import { CartContext } from "./CartContext";
 import { useContext } from "react";
 import Title from "./Title";
-import CartButton from "./CartButton";
+import Button from "./Button"; // Importa el Button funcional
 
 const Bg = styled.div`
   background-color: #222;
   color: white;
   padding: 50px 0;
 `;
-
 
 const Desc = styled.p`
   color: #aaa;
@@ -38,7 +37,6 @@ const Wrapper = styled.div`
     gap: 20px;
   }
 `;
-
 
 const Column = styled.div`
   display: flex;
@@ -89,10 +87,10 @@ export default function Featured({ product }: FeaturedProps) {
                 <ButtonLink href={`/product/${product?._id}`} outline={1} white={1}>
                   Read more
                 </ButtonLink>
-                <CartButton primary onClick={addFeaturedToCart}>
+                <Button primary onClick={addFeaturedToCart}>
                   <CartIcon />
                   Add to cart
-                </CartButton>
+                </Button>
               </ButtonsWrapper>
             </div>
           </Column>

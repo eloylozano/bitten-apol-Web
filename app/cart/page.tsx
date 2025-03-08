@@ -115,200 +115,204 @@ const Button = styled.button`
 `;
 
 export default function CartPage() {
-    const { cartProducts, addProduct, removeProduct } = useCart();
-    const [products, setProducts] = useState<Product[]>([]);
-    const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
-    const [city, setCity] = useState("");
-    const [postalCode, setPostalCode] = useState("");
-    const [streetAddress, setStreetAddress] = useState("");
-    const [country, setCountry] = useState("");
-    const [isSuccess, setIsSuccess] = useState(false);
+  const { cartProducts, addProduct, removeProduct } = useCart();
+  const [products, setProducts] = useState<Product[]>([]);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [city, setCity] = useState("");
+  const [postalCode, setPostalCode] = useState("");
+  const [streetAddress, setStreetAddress] = useState("");
+  const [country, setCountry] = useState("");
+  const [isSuccess, setIsSuccess] = useState(false);
+
+
+  useEffect(() => {
+    const validCartProducts = cartProducts.filter((id) => id != null); // Filtra null y undefined
+    console.log("Valid Cart Products:", validCartProducts); // Verifica el array filtrado
   
-    useEffect(() => {
-      if (cartProducts.length > 0) {
-        axios
-          .post("/api/cart", { ids: cartProducts })
-          .then((response) => {
-            setProducts(response.data);
-          })
-          .catch((error) => {
-            console.error("Error fetching products:", error);
-          });
-      } else {
-        setProducts([]);
-      }
-    }, [cartProducts]);
-  
-    function moreOfThisProduct(id: any) {
-      addProduct(id);
+    if (validCartProducts.length > 0) {
+      axios
+        .post("/api/cart", { ids: validCartProducts })
+        .then((response) => {
+          console.log("API Response:", response.data); // Verifica la respuesta de la API
+          setProducts(response.data);
+        })
+        .catch((error) => {
+          console.error("Error fetching products:", error);
+          setProducts([]); // Limpia los productos en caso de error
+        });
+    } else {
+      setProducts([]);
     }
-  
-    function lessOfThisProduct(id: any) {
-      removeProduct(id);
+  }, [cartProducts]);
+
+  function moreOfThisProduct(id: any) {
+    addProduct(id);
+  }
+
+  function lessOfThisProduct(id: any) {
+    removeProduct(id);
+  }
+
+  async function goToPayment() {
+    const response = await axios.post("/api/checkout", {
+      name,
+      email,
+      city,
+      postalCode,
+      streetAddress,
+      country,
+      cartProducts,
+    });
+    if (response.data.url) {
+      window.location = response.data.url;
     }
-  
-    async function goToPayment() {
-      const response = await axios.post("/api/checkout", {
-        name,
-        email,
-        city,
-        postalCode,
-        streetAddress,
-        country,
-        cartProducts,
-      });
-      if (response.data.url) {
-        window.location = response.data.url;
-      }
-    }
-  
-    let total = 0;
-    for (const productId of cartProducts) {
-      const price = products.find((p) => p._id === productId)?.price || 0;
-      total += price;
-    }
-  
-    if (isSuccess) {
-      return (
-        <>
-          <Header />
-          <Center>
-            <ColumnsWrapper>
-              <Box>
-                <h1>Thanks for your order!</h1>
-                <p>We will email you when your order will be sent.</p>
-              </Box>
-            </ColumnsWrapper>
-          </Center>
-        </>
-      );
-    }
-  
+  }
+
+  let total = 0;
+  for (const productId of cartProducts) {
+    const price = products.find((p) => p._id === productId)?.price || 0;
+    total += price;
+  }
+
+  if (isSuccess) {
     return (
       <>
         <Header />
         <Center>
           <ColumnsWrapper>
             <Box>
-              <h2>Cart</h2>
-              {cartProducts?.length === 0 ? (
-                <div>Your cart is empty</div>
-              ) : products?.length === 0 ? (
-                <div>Loading products...</div>
-              ) : (
-                <Table>
-                  <thead>
-                    <tr>
-                      <th>Product</th>
-                      <th>Quantity</th>
-                      <th>Price</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {products.map((product) => (
-                      <tr key={product._id}>
-                        <ProductInfoCell>
-                          <ProductImageBox>
-                            <img src={product.images[0]} alt={product.title} />
-                          </ProductImageBox>
-                          {product.title}
-                        </ProductInfoCell>
-                        <td>
-                          <MoreLessButton onClick={() => lessOfThisProduct(product._id)}>
-                            -
-                          </MoreLessButton>
-  
-                          <QuantityLabel>
-                            {cartProducts.filter((id) => id === product._id).length}
-                          </QuantityLabel>
-  
-                          <MoreLessButton onClick={() => moreOfThisProduct(product._id)}>
-                            +
-                          </MoreLessButton>
-                        </td>
-                        <td>
-                          {cartProducts.filter((id) => id === product._id).length * product.price} €
-                        </td>
-                      </tr>
-                    ))}
-                    <tr>
-                      <td></td>
-                      <td></td>
-                      <td>{total} €</td>
-                    </tr>
-                  </tbody>
-                </Table>
-              )}
+              <h1>Thanks for your order!</h1>
+              <p>We will email you when your order will be sent.</p>
             </Box>
-            {!!cartProducts?.length && (
-              <Box>
-                <h2>Order Information</h2>
-                <form action="/api/checkout" method="post">
-                  <Input
-                    type="text"
-                    placeholder="Name"
-                    value={name}
-                    name="name"
-                    onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
-                      setName(ev.target.value)
-                    }
-                  />
-                  <Input
-                    type="text"
-                    placeholder="Email"
-                    value={email}
-                    name="email"
-                    onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
-                      setEmail(ev.target.value)
-                    }
-                  />
-                  <CityHolder>
-                    <Input
-                      type="text"
-                      placeholder="City"
-                      value={city}
-                      name="city"
-                      onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
-                        setCity(ev.target.value)
-                      }
-                    />
-                    <Input
-                      type="text"
-                      placeholder="Postal Code"
-                      value={postalCode}
-                      name="postalCode"
-                      onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
-                        setPostalCode(ev.target.value)
-                      }
-                    />
-                  </CityHolder>
-                  <Input
-                    type="text"
-                    placeholder="Street Address"
-                    value={streetAddress}
-                    name="streetAddress"
-                    onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
-                      setStreetAddress(ev.target.value)
-                    }
-                  />
-                  <Input
-                    type="text"
-                    placeholder="Country"
-                    value={country}
-                    name="country"
-                    onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
-                      setCountry(ev.target.value)
-                    }
-                  />
-                  <Button grey="true" block="true" onClick={goToPayment}>
-                  Continue to payment
-                </Button>
-                </form>
-              </Box>
-            )}
           </ColumnsWrapper>
         </Center>
       </>
     );
   }
+
+  return (
+    <>
+      <Header />
+      <Center>
+        <ColumnsWrapper>
+          <Box>
+            <h2>Cart</h2>
+            {cartProducts?.length === 0 ? (
+              <div>Your cart is empty</div>
+            ) : (
+              <Table>
+                <thead>
+                  <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {products.map((product) => (
+                    <tr key={product._id}>
+                      <ProductInfoCell>
+                        <ProductImageBox>
+                          <img src={product.images[0]} alt={product.title} />
+                        </ProductImageBox>
+                        {product.title}
+                      </ProductInfoCell>
+                      <td>
+                        <MoreLessButton onClick={() => lessOfThisProduct(product._id)}>
+                          -
+                        </MoreLessButton>
+
+                        <QuantityLabel>
+                          {cartProducts.filter((id) => id === product._id).length}
+                        </QuantityLabel>
+
+                        <MoreLessButton onClick={() => moreOfThisProduct(product._id)}>
+                          +
+                        </MoreLessButton>
+                      </td>
+                      <td>
+                        {cartProducts.filter((id) => id === product._id).length * product.price} €
+                      </td>
+                    </tr>
+                  ))}
+                  <tr>
+                    <td></td>
+                    <td></td>
+                    <td>{total} €</td>
+                  </tr>
+                </tbody>
+              </Table>
+            )}
+          </Box>
+          {!!cartProducts?.length && (
+            <Box>
+              <h2>Order Information</h2>
+              <form action="/api/checkout" method="post">
+                <Input
+                  type="text"
+                  placeholder="Name"
+                  value={name}
+                  name="name"
+                  onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
+                    setName(ev.target.value)
+                  }
+                />
+                <Input
+                  type="text"
+                  placeholder="Email"
+                  value={email}
+                  name="email"
+                  onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
+                    setEmail(ev.target.value)
+                  }
+                />
+                <CityHolder>
+                  <Input
+                    type="text"
+                    placeholder="City"
+                    value={city}
+                    name="city"
+                    onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
+                      setCity(ev.target.value)
+                    }
+                  />
+                  <Input
+                    type="text"
+                    placeholder="Postal Code"
+                    value={postalCode}
+                    name="postalCode"
+                    onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
+                      setPostalCode(ev.target.value)
+                    }
+                  />
+                </CityHolder>
+                <Input
+                  type="text"
+                  placeholder="Street Address"
+                  value={streetAddress}
+                  name="streetAddress"
+                  onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
+                    setStreetAddress(ev.target.value)
+                  }
+                />
+                <Input
+                  type="text"
+                  placeholder="Country"
+                  value={country}
+                  name="country"
+                  onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
+                    setCountry(ev.target.value)
+                  }
+                />
+                <Button grey="true" block="true" onClick={goToPayment}>
+                  Continue to payment
+                </Button>
+              </form>
+            </Box>
+          )}
+        </ColumnsWrapper>
+      </Center>
+    </>
+  );
+}

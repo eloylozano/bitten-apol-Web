@@ -1,11 +1,10 @@
 import React, { useContext } from "react";
 import styled from "styled-components";
-import Button from "./Button";
+import Button from "./Button"; // Importa el Button funcional
 import CartIcon from "./icons/CartIcon";
 import Link from "next/link";
 import { primary } from "../lib/colors";
 import { CartContext } from "./CartContext";
-import CartButton from "./CartButton";
 
 // Definir el tipo de las props para ProductBox
 interface ProductBoxProps {
@@ -77,13 +76,17 @@ const ProductBox: React.FC<ProductBoxProps> = ({
         </WhiteBox>
       </div>
       <ProductInfoBox>
-        <Title href="uri">{title}</Title>
+        <Title href={url}>{title}</Title>
         <PriceRow>
           <Price>{price} €</Price>
-          <CartButton grey={true} onClick={() => addProduct(_id)} outline>
+          <Button
+            grey={true} // Aplica el estilo gris si es necesario
+            onClick={() => addProduct(_id)}
+            outline // Aplica el estilo outline si es necesario
+          >
             <CartIcon />
             Add to cart
-          </CartButton>
+          </Button>
         </PriceRow>
       </ProductInfoBox>
     </ProductWrapper>
