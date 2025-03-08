@@ -64,6 +64,7 @@ const Input = styled.input`
 const ButtonContainer = styled.div`
   display: flex;
   justify-content: flex-end;
+  gap: 10px; // Espacio entre botones
   margin-top: 20px;
 `;
 
@@ -110,6 +111,15 @@ const AccountPage = () => {
       }
     } catch (error) {
       console.error("Error updating user:", error);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await axios.post("/api/auth/logout"); // Llama al endpoint de logout
+      window.location.href = "/login"; // Redirige al login
+    } catch (error) {
+      console.error("Error during logout:", error);
     }
   };
 
@@ -168,6 +178,7 @@ const AccountPage = () => {
                   Edit Information
                 </Button>
               )}
+              <Button grey onClick={handleLogout}>Logout</Button>
             </ButtonContainer>
           </WhiteBox>
         </AccountContainer>
