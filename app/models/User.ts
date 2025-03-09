@@ -1,12 +1,13 @@
-import mongoose, { Schema } from 'mongoose';
+// models/User.ts
+import mongoose from "mongoose";
 
-const userSchema = new Schema({
+const userSchema = new mongoose.Schema({
   firstName: String,
   lastName: String,
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  phone: String, 
-  profilePicture: String, 
+  phone: String,
+  profilePicture: String,
   address: {
     street: String,
     city: String,
@@ -15,6 +16,4 @@ const userSchema = new Schema({
   },
 });
 
-const User = mongoose.models.User || mongoose.model("User", userSchema);
-
-export default User;
+export default mongoose.models.User || mongoose.model("User", userSchema);

@@ -82,32 +82,43 @@ const ButtonContainer = styled.div`
 `;
 
 const ProfilePicture = styled.img`
-  width: 100px;
-  height: 100px;
+  width: 250px;
+  height: 250px;
   border-radius: 50%;
   object-fit: cover;
-  margin-bottom: 20px;
-`;
+  margin: 0px auto 20px;
+  `;
 
 const AccountPage = () => {
   const [user, setUser] = useState<User | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [isEditingAddress, setIsEditingAddress] = useState(false);
   const [editedFirstName, setEditedFirstName] = useState("");
   const [editedLastName, setEditedLastName] = useState("");
   const [editedPhone, setEditedPhone] = useState("");
   const [profilePicture, setProfilePicture] = useState("");
+  const [editedStreet, setEditedStreet] = useState("");
+  const [editedCity, setEditedCity] = useState("");
+  const [editedPostalCode, setEditedPostalCode] = useState("");
+  const [editedCountry, setEditedCountry] = useState("");
 
   useEffect(() => {
     const checkUserSession = async () => {
       try {
         const res = await axios.get("/api/auth/me");
-  
+
         if (res.status === 200) {
           setUser(res.data);
           setEditedFirstName(res.data.firstName);
           setEditedLastName(res.data.lastName);
           setEditedPhone(res.data.phone || "");
-          setProfilePicture(res.data.profilePicture || "");  // Asegúrate de obtener la URL actualizada
+          setProfilePicture(res.data.profilePicture || "");
+          if (res.data.address) {
+            setEditedStreet(res.data.address.street);
+            setEditedCity(res.data.address.city);
+            setEditedPostalCode(res.data.address.postalCode);
+            setEditedCountry(res.data.address.country);
+          }
         } else {
           window.location.href = "/login";
         }
@@ -115,10 +126,9 @@ const AccountPage = () => {
         window.location.href = "/login";
       }
     };
-  
+
     checkUserSession();
   }, []);
-  
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -129,8 +139,8 @@ const AccountPage = () => {
       const res = await axios.put("/api/auth/update", {
         firstName: editedFirstName,
         lastName: editedLastName,
-        phone: editedPhone, // Envía el teléfono
-        profilePicture, // Envía la URL de la foto de perfil
+        phone: editedPhone,
+        profilePicture,
       });
 
       if (res.status === 200) {
@@ -155,13 +165,34 @@ const AccountPage = () => {
 
       if (res.data.url) {
         setProfilePicture(res.data.url);
-        // Aquí puedes actualizar la base de datos también si es necesario
         await axios.put("/api/auth/update", {
-          profilePicture: res.data.url,  // Envía la URL de la foto
+          profilePicture: res.data.url,
         });
       }
     } catch (error) {
       console.error("Error uploading profile picture:", error);
+    }
+  };
+
+  const handleEditAddress = () => {
+    setIsEditingAddress(true);
+  };
+
+  const handleSaveAddress = async () => {
+    try {
+      const res = await axios.put("/api/auth/update-address", {
+        street: editedStreet,
+        city: editedCity,
+        postalCode: editedPostalCode,
+        country: editedCountry,
+      });
+  
+      if (res.status === 200) {
+        setUser(res.data);
+        setIsEditingAddress(false);
+      }
+    } catch (error) {
+      console.error("Error updating address:", error);
     }
   };
 
@@ -267,27 +298,71 @@ const AccountPage = () => {
               </ButtonContainer>
             </WhiteBox>
           </Column>
+
           <Column>
             <Title>Address Information</Title>
             <WhiteBox>
               <UserInfo>
                 <InfoRow>
                   <Label>Street:</Label>
-                  <Value>{user.address?.street || "Not provided"}</Value>
+                  {isEditingAddress ? (
+                    <Input
+                      type="text"
+                      value={editedStreet}
+                      onChange={(e) => setEditedStreet(e.target.value)}
+                    />
+                  ) : (
+                    <Value>{user.address?.street || "Not provided"}</Value>
+                  )}
                 </InfoRow>
                 <InfoRow>
                   <Label>City:</Label>
-                  <Value>{user.address?.city || "Not provided"}</Value>
+                  {isEditingAddress ? (
+                    <Input
+                      type="text"
+                      value={editedCity}
+                      onChange={(e) => setEditedCity(e.target.value)}
+                    />
+                  ) : (
+                    <Value>{user.address?.city || "Not provided"}</Value>
+                  )}
                 </InfoRow>
                 <InfoRow>
                   <Label>Postal Code:</Label>
-                  <Value>{user.address?.postalCode || "Not provided"}</Value>
+                  {isEditingAddress ? (
+                    <Input
+                      type="text"
+                      value={editedPostalCode}
+                      onChange={(e) => setEditedPostalCode(e.target.value)}
+                    />
+                  ) : (
+                    <Value>{user.address?.postalCode || "Not provided"}</Value>
+                  )}
                 </InfoRow>
                 <InfoRow>
                   <Label>Country:</Label>
-                  <Value>{user.address?.country || "Not provided"}</Value>
+                  {isEditingAddress ? (
+                    <Input
+                      type="text"
+                      value={editedCountry}
+                      onChange={(e) => setEditedCountry(e.target.value)}
+                    />
+                  ) : (
+                    <Value>{user.address?.country || "Not provided"}</Value>
+                  )}
                 </InfoRow>
               </UserInfo>
+              <ButtonContainer>
+                {isEditingAddress ? (
+                  <Button primary onClick={handleSaveAddress}>
+                    Save Address
+                  </Button>
+                ) : (
+                  <Button primary onClick={handleEditAddress}>
+                    Edit Address
+                  </Button>
+                )}
+              </ButtonContainer>
             </WhiteBox>
           </Column>
         </AccountContainer>
