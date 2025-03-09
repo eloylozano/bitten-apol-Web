@@ -15,16 +15,29 @@ interface User {
   firstName: string;
   lastName: string;
   email: string;
+  phone: string;
+  profilePicture: string;
+  address: {
+    street: string;
+    city: string;
+    postalCode: string;
+    country: string;
+  };
 }
 
 const AccountContainer = styled.div`
   display: flex;
-  flex-direction: column;
-  min-height: 81vh;
   gap: 20px;
-  max-width: 800px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
+`;
+
+const Column = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 `;
 
 const UserInfo = styled.div`
@@ -68,21 +81,33 @@ const ButtonContainer = styled.div`
   margin-top: 20px;
 `;
 
+const ProfilePicture = styled.img`
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 20px;
+`;
+
 const AccountPage = () => {
   const [user, setUser] = useState<User | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editedFirstName, setEditedFirstName] = useState("");
   const [editedLastName, setEditedLastName] = useState("");
+  const [editedPhone, setEditedPhone] = useState("");
+  const [profilePicture, setProfilePicture] = useState("");
 
   useEffect(() => {
     const checkUserSession = async () => {
       try {
         const res = await axios.get("/api/auth/me");
-
+  
         if (res.status === 200) {
           setUser(res.data);
           setEditedFirstName(res.data.firstName);
           setEditedLastName(res.data.lastName);
+          setEditedPhone(res.data.phone || "");
+          setProfilePicture(res.data.profilePicture || "");  // Asegúrate de obtener la URL actualizada
         } else {
           window.location.href = "/login";
         }
@@ -90,9 +115,10 @@ const AccountPage = () => {
         window.location.href = "/login";
       }
     };
-
+  
     checkUserSession();
   }, []);
+  
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -103,6 +129,8 @@ const AccountPage = () => {
       const res = await axios.put("/api/auth/update", {
         firstName: editedFirstName,
         lastName: editedLastName,
+        phone: editedPhone, // Envía el teléfono
+        profilePicture, // Envía la URL de la foto de perfil
       });
 
       if (res.status === 200) {
@@ -114,12 +142,35 @@ const AccountPage = () => {
     }
   };
 
+  const handleProfilePictureUpload = async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await axios.post("/api/upload-profile-picture", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      if (res.data.url) {
+        setProfilePicture(res.data.url);
+        // Aquí puedes actualizar la base de datos también si es necesario
+        await axios.put("/api/auth/update", {
+          profilePicture: res.data.url,  // Envía la URL de la foto
+        });
+      }
+    } catch (error) {
+      console.error("Error uploading profile picture:", error);
+    }
+  };
+
   const handleLogout = async () => {
     try {
-      await axios.post("/api/auth/logout"); 
+      await axios.post("/api/auth/logout");
       localStorage.removeItem("authToken");
-      localStorage.removeItem("cart"); 
-      window.location.href = "/login"; 
+      localStorage.removeItem("cart");
+      window.location.href = "/login";
     } catch (error) {
       console.error("Error during logout:", error);
     }
@@ -138,51 +189,107 @@ const AccountPage = () => {
       <Header />
       <Center>
         <AccountContainer>
-          <Title>Account Information</Title>
-          <WhiteBox>
-            <UserInfo>
-              <InfoRow>
-                <Label>First Name:</Label>
-                {isEditing ? (
-                  <Input
-                    type="text"
-                    value={editedFirstName}
-                    onChange={(e) => setEditedFirstName(e.target.value)}
-                  />
-                ) : (
-                  <Value>{user.firstName}</Value>
+          <Column>
+            <Title>Profile Information</Title>
+            <WhiteBox>
+              <UserInfo>
+                <ProfilePicture
+                  src={profilePicture || "/default-profile.png"}
+                  alt="Profile Picture"
+                />
+                <InfoRow>
+                  <Label>First Name:</Label>
+                  {isEditing ? (
+                    <Input
+                      type="text"
+                      value={editedFirstName}
+                      onChange={(e) => setEditedFirstName(e.target.value)}
+                    />
+                  ) : (
+                    <Value>{user.firstName}</Value>
+                  )}
+                </InfoRow>
+                <InfoRow>
+                  <Label>Last Name:</Label>
+                  {isEditing ? (
+                    <Input
+                      type="text"
+                      value={editedLastName}
+                      onChange={(e) => setEditedLastName(e.target.value)}
+                    />
+                  ) : (
+                    <Value>{user.lastName}</Value>
+                  )}
+                </InfoRow>
+                <InfoRow>
+                  <Label>Email:</Label>
+                  <Value>{user.email}</Value>
+                </InfoRow>
+                <InfoRow>
+                  <Label>Phone:</Label>
+                  {isEditing ? (
+                    <Input
+                      type="text"
+                      value={editedPhone}
+                      onChange={(e) => setEditedPhone(e.target.value)}
+                    />
+                  ) : (
+                    <Value>{user.phone || "Not provided"}</Value>
+                  )}
+                </InfoRow>
+                {isEditing && (
+                  <InfoRow>
+                    <Label>Profile Picture:</Label>
+                    <Input
+                      type="file"
+                      onChange={(e) => {
+                        if (e.target.files && e.target.files[0]) {
+                          handleProfilePictureUpload(e.target.files[0]);
+                        }
+                      }}
+                    />
+                  </InfoRow>
                 )}
-              </InfoRow>
-              <InfoRow>
-                <Label>Last Name:</Label>
+              </UserInfo>
+              <ButtonContainer>
                 {isEditing ? (
-                  <Input
-                    type="text"
-                    value={editedLastName}
-                    onChange={(e) => setEditedLastName(e.target.value)}
-                  />
+                  <Button primary onClick={handleSave}>
+                    Save Changes
+                  </Button>
                 ) : (
-                  <Value>{user.lastName}</Value>
+                  <Button primary onClick={handleEdit}>
+                    Edit Information
+                  </Button>
                 )}
-              </InfoRow>
-              <InfoRow>
-                <Label>Email:</Label>
-                <Value>{user.email}</Value>
-              </InfoRow>
-            </UserInfo>
-            <ButtonContainer>
-              {isEditing ? (
-                <Button primary onClick={handleSave}>
-                  Save Changes
+                <Button grey onClick={handleLogout}>
+                  Logout
                 </Button>
-              ) : (
-                <Button primary onClick={handleEdit}>
-                  Edit Information
-                </Button>
-              )}
-              <Button grey onClick={handleLogout}>Logout</Button>
-            </ButtonContainer>
-          </WhiteBox>
+              </ButtonContainer>
+            </WhiteBox>
+          </Column>
+          <Column>
+            <Title>Address Information</Title>
+            <WhiteBox>
+              <UserInfo>
+                <InfoRow>
+                  <Label>Street:</Label>
+                  <Value>{user.address?.street || "Not provided"}</Value>
+                </InfoRow>
+                <InfoRow>
+                  <Label>City:</Label>
+                  <Value>{user.address?.city || "Not provided"}</Value>
+                </InfoRow>
+                <InfoRow>
+                  <Label>Postal Code:</Label>
+                  <Value>{user.address?.postalCode || "Not provided"}</Value>
+                </InfoRow>
+                <InfoRow>
+                  <Label>Country:</Label>
+                  <Value>{user.address?.country || "Not provided"}</Value>
+                </InfoRow>
+              </UserInfo>
+            </WhiteBox>
+          </Column>
         </AccountContainer>
       </Center>
       <Footer />
