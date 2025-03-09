@@ -59,7 +59,7 @@ const ButtonContainer = styled.div`
   display: flex;
   margin-top: 10px;
   justify-content: center;
-`
+`;
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -69,14 +69,12 @@ const Login = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Validación básica de los campos
+  
     if (!email || !password) {
       setError("Por favor, ingresa todos los campos.");
       return;
     }
-
-    // Realizar la llamada a la API para la autenticación
+  
     try {
       const response = await fetch("http://localhost:3000/api/auth/login", {
         method: "POST",
@@ -85,12 +83,12 @@ const Login = () => {
         },
         body: JSON.stringify({ email, password }),
       });
-
+  
       const data = await response.json();
-
+  
       if (response.status === 200) {
-        // Si la autenticación es exitosa, redirigir a la página anterior o al dashboard
-        router.push("/"); // O la ruta a la que quieras redirigir al usuario
+        localStorage.setItem("authToken", data.token); // Guarda el token en localStorage
+        router.push("/"); // Redirige al usuario a la página principal
       } else {
         setError(data.message || "Error en la autenticación.");
       }

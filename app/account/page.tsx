@@ -64,7 +64,7 @@ const Input = styled.input`
 const ButtonContainer = styled.div`
   display: flex;
   justify-content: flex-end;
-  gap: 10px; // Espacio entre botones
+  gap: 10px;
   margin-top: 20px;
 `;
 
@@ -84,10 +84,10 @@ const AccountPage = () => {
           setEditedFirstName(res.data.firstName);
           setEditedLastName(res.data.lastName);
         } else {
-          window.location.href = "/login"; // Redirige si la sesión no es válida
+          window.location.href = "/login";
         }
       } catch (error) {
-        window.location.href = "/login"; // Redirige si hay error
+        window.location.href = "/login";
       }
     };
 
@@ -116,8 +116,10 @@ const AccountPage = () => {
 
   const handleLogout = async () => {
     try {
-      await axios.post("/api/auth/logout"); // Llama al endpoint de logout
-      window.location.href = "/login"; // Redirige al login
+      await axios.post("/api/auth/logout"); 
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("cart"); 
+      window.location.href = "/login"; 
     } catch (error) {
       console.error("Error during logout:", error);
     }

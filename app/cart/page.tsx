@@ -151,7 +151,7 @@ export default function CartPage() {
   }
 
   function lessOfThisProduct(id: any) {
-    removeProduct(id);
+    removeProduct(id); // Llama a removeProduct, que ahora elimina solo una instancia
   }
 
   async function goToPayment() {

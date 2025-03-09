@@ -1,12 +1,12 @@
-import React, { useContext } from "react";
+import React from "react";
 import styled from "styled-components";
-import Button from "./Button"; // Importa el Button funcional
+import Button from "./Button";
 import CartIcon from "./icons/CartIcon";
 import Link from "next/link";
 import { primary } from "../lib/colors";
-import { CartContext } from "./CartContext";
+import { useCart } from "./CartContext"; // Usa useCart en lugar de useContext
+import { useRouter } from "next/navigation";
 
-// Definir el tipo de las props para ProductBox
 interface ProductBoxProps {
   _id: string;
   title: string;
@@ -65,8 +65,17 @@ const ProductBox: React.FC<ProductBoxProps> = ({
   images,
 }) => {
   const url = "/product/" + _id;
+  const { addProduct } = useCart(); // Usa useCart para acceder al contexto
+  const router = useRouter();
 
-  const { addProduct } = useContext(CartContext);
+  const handleAddToCart = () => {
+    const isAuthenticated = localStorage.getItem("authToken"); // Verifica si el token existe
+    if (!isAuthenticated) {
+      router.push("/login"); // Redirige al usuario a la página de login
+      return;
+    }
+    addProduct(_id); // Si está logueado, añade el producto al carrito
+  };
 
   return (
     <ProductWrapper>
@@ -79,11 +88,7 @@ const ProductBox: React.FC<ProductBoxProps> = ({
         <Title href={url}>{title}</Title>
         <PriceRow>
           <Price>{price} €</Price>
-          <Button
-            grey={true} // Aplica el estilo gris si es necesario
-            onClick={() => addProduct(_id)}
-            outline // Aplica el estilo outline si es necesario
-          >
+          <Button grey={true} onClick={handleAddToCart} outline>
             <CartIcon />
             Add to cart
           </Button>
