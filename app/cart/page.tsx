@@ -9,6 +9,7 @@ import axios from "axios";
 import Table from "../components/Table";
 import Input from "../components/Input";
 import Footer from "../components/Footer";
+import Swal from 'sweetalert2';
 
 interface Product {
   _id: string;
@@ -115,7 +116,7 @@ const Button = styled.button`
 `;
 
 export default function CartPage() {
-  const { cartProducts, addProduct, removeProduct } = useCart();
+  const { cartProducts, addProduct, removeProduct, clearCart } = useCart();
   const [products, setProducts] = useState<Product[]>([]);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -129,7 +130,7 @@ export default function CartPage() {
   useEffect(() => {
     const validCartProducts = cartProducts.filter((id) => id != null); // Filtra null y undefined
     console.log("Valid Cart Products:", validCartProducts); // Verifica el array filtrado
-  
+
     if (validCartProducts.length > 0) {
       axios
         .post("/api/cart", { ids: validCartProducts })
@@ -154,19 +155,18 @@ export default function CartPage() {
     removeProduct(id); // Llama a removeProduct, que ahora elimina solo una instancia
   }
 
-  async function goToPayment() {
-    const response = await axios.post("/api/checkout", {
-      name,
-      email,
-      city,
-      postalCode,
-      streetAddress,
-      country,
-      cartProducts,
+  function handlePurchase() {
+    clearCart(); // Vacía el carrito
+
+    // Muestra el pop-up de SweetAlert2
+    Swal.fire({
+      title: '¡Compra realizada con éxito!',
+      text: 'Gracias por tu compra.',
+      icon: 'success',
+      confirmButtonText: 'Aceptar',
+    }).then(() => {
+      setIsSuccess(true); // Cambia el estado para mostrar el mensaje de éxito
     });
-    if (response.data.url) {
-      window.location = response.data.url;
-    }
   }
 
   let total = 0;
@@ -248,67 +248,9 @@ export default function CartPage() {
           {!!cartProducts?.length && (
             <Box>
               <h2>Order Information</h2>
-              <form action="/api/checkout" method="post">
-                <Input
-                  type="text"
-                  placeholder="Name"
-                  value={name}
-                  name="name"
-                  onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
-                    setName(ev.target.value)
-                  }
-                />
-                <Input
-                  type="text"
-                  placeholder="Email"
-                  value={email}
-                  name="email"
-                  onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
-                    setEmail(ev.target.value)
-                  }
-                />
-                <CityHolder>
-                  <Input
-                    type="text"
-                    placeholder="City"
-                    value={city}
-                    name="city"
-                    onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
-                      setCity(ev.target.value)
-                    }
-                  />
-                  <Input
-                    type="text"
-                    placeholder="Postal Code"
-                    value={postalCode}
-                    name="postalCode"
-                    onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
-                      setPostalCode(ev.target.value)
-                    }
-                  />
-                </CityHolder>
-                <Input
-                  type="text"
-                  placeholder="Street Address"
-                  value={streetAddress}
-                  name="streetAddress"
-                  onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
-                    setStreetAddress(ev.target.value)
-                  }
-                />
-                <Input
-                  type="text"
-                  placeholder="Country"
-                  value={country}
-                  name="country"
-                  onChange={(ev: React.ChangeEvent<HTMLInputElement>) =>
-                    setCountry(ev.target.value)
-                  }
-                />
-                <Button grey="true" block="true" onClick={goToPayment}>
-                  Continue to payment
-                </Button>
-              </form>
+              <Button grey="true" block="true" onClick={handlePurchase}>
+                Continue to payment
+              </Button>
             </Box>
           )}
         </ColumnsWrapper>

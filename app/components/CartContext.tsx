@@ -8,6 +8,7 @@ interface CartContextType {
   setCartProducts: React.Dispatch<React.SetStateAction<string[]>>;
   addProduct: (id: string) => void;
   removeProduct: (id: string) => void;
+  clearCart: () => void;
 }
 
 export const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -22,9 +23,8 @@ export function useCart() {
 
 export function CartContextProvider({ children }: { children: ReactNode }) {
   const [cartProducts, setCartProducts] = useState<string[]>([]);
-  const router = useRouter(); // Usa useRouter para redirigir al usuario
+  const router = useRouter();
 
-  // Cargar el carrito desde localStorage al iniciar
   useEffect(() => {
     const savedCart = localStorage.getItem("cart");
     if (savedCart) {
@@ -32,18 +32,17 @@ export function CartContextProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  // Guardar el carrito en localStorage cuando cambia
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cartProducts));
   }, [cartProducts]);
 
   function addProduct(productId: string) {
-    const isAuthenticated = localStorage.getItem("authToken"); // Verifica si el token existe
+    const isAuthenticated = localStorage.getItem("authToken");
     if (!isAuthenticated) {
-      router.push("/login"); // Redirige al usuario a la página de login
+      router.push("/login");
       return;
     }
-    setCartProducts((prev) => [...prev, productId]); // Añade el producto al carrito
+    setCartProducts((prev) => [...prev, productId]);
   }
 
   function removeProduct(productId: string) {
@@ -51,7 +50,7 @@ export function CartContextProvider({ children }: { children: ReactNode }) {
       const index = prev.indexOf(productId);
       if (index !== -1) {
         const newCart = [...prev];
-        newCart.splice(index, 1); // Elimina solo una instancia del producto
+        newCart.splice(index, 1);
         return newCart;
       }
       return prev;
@@ -63,7 +62,7 @@ export function CartContextProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <CartContext.Provider value={{ cartProducts, setCartProducts, addProduct, removeProduct }}>
+    <CartContext.Provider value={{ cartProducts, setCartProducts, addProduct, removeProduct, clearCart }}>
       {children}
     </CartContext.Provider>
   );
