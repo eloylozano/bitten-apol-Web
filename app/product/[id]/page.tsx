@@ -128,6 +128,8 @@ export default function ProductPage({
                 <Button
                   primary={true}
                   onClick={() => handleAddToCart(product._id)}
+                  showToast={true} // Activa el pop-up
+                  toastMessage="Se añadió el producto al carrito" // Mensaje personalizado
                 >
                   <CartIcon />{" "}
                   {isAdded ? "Added to cart" : "Add to cart"}

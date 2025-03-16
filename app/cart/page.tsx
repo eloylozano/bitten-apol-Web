@@ -118,12 +118,6 @@ const Button = styled.button`
 export default function CartPage() {
   const { cartProducts, addProduct, removeProduct, clearCart } = useCart();
   const [products, setProducts] = useState<Product[]>([]);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [city, setCity] = useState("");
-  const [postalCode, setPostalCode] = useState("");
-  const [streetAddress, setStreetAddress] = useState("");
-  const [country, setCountry] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
 
 
@@ -169,6 +163,27 @@ export default function CartPage() {
     });
   }
 
+  function handleClearCart() {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, clear it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        clearCart();
+        Swal.fire(
+          'Cleared!',
+          'Your cart has been cleared.',
+          'success'
+        );
+      }
+    });
+  }
+
   let total = 0;
   for (const productId of cartProducts) {
     const price = products.find((p) => p._id === productId)?.price || 0;
@@ -201,49 +216,55 @@ export default function CartPage() {
             {cartProducts?.length === 0 ? (
               <div>Your cart is empty</div>
             ) : (
-              <Table>
-                <thead>
-                  <tr>
-                    <th>Product</th>
-                    <th>Quantity</th>
-                    <th>Price</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {products.map((product) => (
-                    <tr key={product._id}>
-                      <ProductInfoCell>
-                        <ProductImageBox>
-                          <img src={product.images[0]} alt={product.title} />
-                        </ProductImageBox>
-                        {product.title}
-                      </ProductInfoCell>
-                      <td>
-                        <MoreLessButton onClick={() => lessOfThisProduct(product._id)}>
-                          -
-                        </MoreLessButton>
-
-                        <QuantityLabel>
-                          {cartProducts.filter((id) => id === product._id).length}
-                        </QuantityLabel>
-
-                        <MoreLessButton onClick={() => moreOfThisProduct(product._id)}>
-                          +
-                        </MoreLessButton>
-                      </td>
-                      <td>
-                        {cartProducts.filter((id) => id === product._id).length * product.price} €
-                      </td>
+              <>
+                <Table>
+                  <thead>
+                    <tr>
+                      <th>Product</th>
+                      <th>Quantity</th>
+                      <th>Price</th>
                     </tr>
-                  ))}
-                  <tr>
-                    <td></td>
-                    <td></td>
-                    <td>{total} €</td>
-                  </tr>
-                </tbody>
-              </Table>
+                  </thead>
+                  <tbody>
+                    {products.map((product) => (
+                      <tr key={product._id}>
+                        <ProductInfoCell>
+                          <ProductImageBox>
+                            <img src={product.images[0]} alt={product.title} />
+                          </ProductImageBox>
+                          {product.title}
+                        </ProductInfoCell>
+                        <td>
+                          <MoreLessButton onClick={() => lessOfThisProduct(product._id)}>
+                            -
+                          </MoreLessButton>
+
+                          <QuantityLabel>
+                            {cartProducts.filter((id) => id === product._id).length}
+                          </QuantityLabel>
+
+                          <MoreLessButton onClick={() => moreOfThisProduct(product._id)}>
+                            +
+                          </MoreLessButton>
+                        </td>
+                        <td>
+                          {cartProducts.filter((id) => id === product._id).length * product.price} €
+                        </td>
+                      </tr>
+                    ))}
+                    <tr>
+                      <td></td>
+                      <td></td>
+                      <td>{total} €</td>
+                    </tr>
+                  </tbody>
+                </Table>
+              </>
             )}
+
+            <Button block="true" onClick={handleClearCart}>
+              Clear Cart
+            </Button>
           </Box>
           {!!cartProducts?.length && (
             <Box>

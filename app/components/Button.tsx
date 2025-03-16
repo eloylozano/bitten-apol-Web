@@ -1,6 +1,7 @@
 import React, { ReactNode } from "react";
 import styled, { css } from "styled-components";
 import { primary } from "../lib/colors";
+import { toast } from 'react-toastify'; // Importa toast
 
 interface ButtonProps {
   children: ReactNode;
@@ -11,6 +12,8 @@ interface ButtonProps {
   primary?: boolean;
   size?: "s" | "m" | "l";
   onClick?: () => void;
+  showToast?: boolean; // Nueva prop para controlar el pop-up
+  toastMessage?: string; // Mensaje personalizado para el pop-up
 }
 
 export const ButtonStyle = css<ButtonProps>`
@@ -88,18 +91,37 @@ export const ButtonStyle = css<ButtonProps>`
 `;
 
 export const StyledButton = styled.button.withConfig({
-
-  
   shouldForwardProp: (prop) =>
-    !["white", "outline", "grey", "block", "primary", "size"].includes(
+    !["white", "outline", "grey", "block", "primary", "size", "showToast", "toastMessage"].includes(
       prop as string
     ),
 })<ButtonProps>`
   ${ButtonStyle}
 `;
 
-const Button: React.FC<ButtonProps> = ({ children, ...rest }) => {
-  return <StyledButton {...rest}>{children}</StyledButton>;
+const Button: React.FC<ButtonProps> = ({ children, onClick, showToast, toastMessage, ...rest }) => {
+  const handleClick = () => {
+    if (onClick) {
+      onClick(); // Ejecuta la función onClick si está definida
+    }
+
+    if (showToast) {
+      toast.success(toastMessage || "Acción completada", { // Muestra el pop-up si showToast es true
+        position: "top-right", // Posición del pop-up
+        autoClose: 2000, // Duración del pop-up (2 segundos)
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+    }
+  };
+
+  return (
+    <StyledButton {...rest} onClick={handleClick}>
+      {children}
+    </StyledButton>
+  );
 };
 
 export default Button;

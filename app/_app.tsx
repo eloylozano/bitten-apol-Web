@@ -1,6 +1,7 @@
 import { AppProps } from "next/app"; // Si usas Next.js
 import { CartContextProvider } from "./components/CartContext";
-
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { createGlobalStyle } from "styled-components";
 import Head from "next/head";
 import { AuthContextProvider } from "./components/AuthContext";
@@ -25,6 +26,7 @@ export default function App({ Component, pageProps }: AppProps) {
       <GlobalStyles />
       <CartContextProvider>
         <AuthContextProvider>
+          <ToastContainer position="top-right" autoClose={3000} />
           <Component {...pageProps} />
         </AuthContextProvider>
       </CartContextProvider>
