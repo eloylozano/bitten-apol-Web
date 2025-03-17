@@ -1,6 +1,7 @@
 "use client";
 
-import { createContext, useState, ReactNode, useContext } from "react";
+import { useRouter } from "next/router";
+import { createContext, useState, ReactNode, useContext, useEffect } from "react";
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -19,14 +20,25 @@ export function useAuth() {
 }
 
 export function AuthContextProvider({ children }: { children: ReactNode }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  // Leer el estado de autenticación desde el localStorage
+  const storedAuthState = typeof window !== "undefined" ? localStorage.getItem("authToken") : null;
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(storedAuthState !== null);
+
+  useEffect(() => {
+    // Verificar si el token está presente en localStorage al iniciar la aplicación
+    if (storedAuthState) {
+      setIsAuthenticated(true);
+    }
+  }, [storedAuthState]);
 
   const login = () => {
     setIsAuthenticated(true);
+    // También puedes guardar el token en localStorage en esta función si no lo has hecho antes
   };
 
   const logout = () => {
     setIsAuthenticated(false);
+    localStorage.removeItem("authToken");
   };
 
   return (

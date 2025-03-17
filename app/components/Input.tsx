@@ -6,9 +6,11 @@ const StyledInput = styled.input`
   margin-bottom: 5px;
   border: 1px solid #ccc;
   border-radius: 5px;
-  box-sizing:border-box;
+  box-sizing: border-box;
 `;
 
-export default function Input(props) {
-  return <StyledInput {...props} />
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {}
+
+export default function Input(props: InputProps) {
+  return <StyledInput {...props} />;
 }

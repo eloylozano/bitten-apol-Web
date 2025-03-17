@@ -2,15 +2,19 @@ import { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/router";
 
-const AuthForm = ({ setIsLoggedIn }) => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [isRegister, setIsRegister] = useState(false);
+interface AuthFormProps {
+  setIsLoggedIn: (isLoggedIn: boolean) => void;
+}
+
+const AuthForm = ({ setIsLoggedIn }: AuthFormProps) => {
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [firstName, setFirstName] = useState<string>("");
+  const [lastName, setLastName] = useState<string>("");
+  const [isRegister, setIsRegister] = useState<boolean>(false);
   const router = useRouter();
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {

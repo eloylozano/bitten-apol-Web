@@ -15,6 +15,7 @@ import { SyncLoader } from "react-spinners";
 import NewProducts from "@/app/components/NewProducts";
 import Footer from "@/app/components/Footer";
 import { useRouter } from "next/navigation"; // Para redirigir
+import { useAuth } from "@/app/components/AuthContext";
 
 const ColWrapper = styled.div`
   display: grid;
@@ -62,45 +63,36 @@ export default function ProductPage({
   const { addProduct } = useCart();
   const [product, setProduct] = useState<Product | null>(null);
   const [recentProducts, setRecentProducts] = useState<Product[]>([]);
-  const [isAdded, setIsAdded] = useState(false);  // Estado para el feedback de añadir al carrito
-  const [user, setUser] = useState<any>(null); // Estado para el usuario autenticado
-  const router = useRouter(); // Para redirigir
+  const [isAdded, setIsAdded] = useState(false);
+  const { isAuthenticated, login, logout } = useAuth(); // Usa el contexto de autenticación
+  const router = useRouter();
 
   useEffect(() => {
     async function fetchProduct() {
-      const response = await fetch(`http://localhost:3000/api/product/${id}`);
+      const response = await fetch(`/api/product/${id}`);
       const data: Product = await response.json();
       setProduct(data);
     }
 
     async function fetchRecentProducts() {
-      const response = await fetch("http://localhost:3000/api/products");
+      const response = await fetch("/api/products");
       const data: Product[] = await response.json();
       setRecentProducts(data.slice(0, 12));
     }
 
-    async function checkUserSession() {
-      const response = await fetch("/api/auth/me"); // Ajusta la URL según sea necesario
-      if (response.status === 200) {
-        const data = await response.json();
-        setUser(data); // Guarda el usuario si está autenticado
-      }
-    }
-
     fetchProduct();
     fetchRecentProducts();
-    checkUserSession();
   }, [id]);
 
   const handleAddToCart = (productId: string) => {
-    if (!user) { // Verifica si el usuario está autenticado
+    if (!isAuthenticated) { // Verifica si el usuario está autenticado usando el contexto
       router.push("/login"); // Redirige al login si no está autenticado
       return;
     }
 
     addProduct(productId);
-    setIsAdded(true);  // Muestra el feedback visual
-    setTimeout(() => setIsAdded(false), 2000);  // Restablece el feedback después de 2 segundos
+    setIsAdded(true);
+    setTimeout(() => setIsAdded(false), 2000);
   };
 
   if (!product) {
@@ -128,8 +120,8 @@ export default function ProductPage({
                 <Button
                   primary={true}
                   onClick={() => handleAddToCart(product._id)}
-                  showToast={true} // Activa el pop-up
-                  toastMessage="Se añadió el producto al carrito" // Mensaje personalizado
+                  showToast={true}
+                  toastMessage="Se añadió el producto al carrito"
                 >
                   <CartIcon />{" "}
                   {isAdded ? "Added to cart" : "Add to cart"}

@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { CartContextProvider } from "./components/CartContext"; // 🔹 Importa el proveedor
+import { CartContextProvider } from "./components/CartContext";
+import { AuthContextProvider } from "./components/AuthContext"; // 🔥 Importa el AuthContextProvider
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,8 +31,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <CartContextProvider> {/* 🔹 Envuelve toda la app */}
-          {children}
+        <CartContextProvider>
+          <AuthContextProvider>
+            <ToastContainer position="top-right" autoClose={3000} /> {/* Opcional */}
+            {children}
+          </AuthContextProvider>
         </CartContextProvider>
       </body>
     </html>

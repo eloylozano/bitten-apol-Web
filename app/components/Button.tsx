@@ -1,7 +1,9 @@
 import React, { ReactNode } from "react";
 import styled, { css } from "styled-components";
 import { primary } from "../lib/colors";
-import { toast } from 'react-toastify'; // Importa toast
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation"; 
+import { useAuth } from "./AuthContext";
 
 interface ButtonProps {
   children: ReactNode;
@@ -12,9 +14,11 @@ interface ButtonProps {
   primary?: boolean;
   size?: "s" | "m" | "l";
   onClick?: () => void;
-  showToast?: boolean; // Nueva prop para controlar el pop-up
-  toastMessage?: string; // Mensaje personalizado para el pop-up
+  showToast?: boolean;
+  toastMessage?: string;
+  type?: "button" | "submit" | "reset";  // Agregar esto para permitir el tipo 'submit'
 }
+
 
 export const ButtonStyle = css<ButtonProps>`
   color: #252525;
@@ -49,14 +53,13 @@ export const ButtonStyle = css<ButtonProps>`
       border: 1px solid #fff;
     `}
 
-    ${(props) =>
+  ${(props) =>
     props.grey &&
     css`
       background-color: #252525;
       color: #fff;
       border: 1px solid #252525;
     `}
-  
 
   ${(props) =>
     props.primary &&
@@ -75,19 +78,19 @@ export const ButtonStyle = css<ButtonProps>`
       border: 1px solid ${primary};
       color: ${primary};
     `}
+
   ${(props) =>
     props.block &&
     css`
       display: block;
     `}
 
-
   ${(props) =>
     props.size === "l" &&
     css`
       font-size: 1.2rem;
       padding: 10px 20px;
-    `}
+    `};
 `;
 
 export const StyledButton = styled.button.withConfig({
@@ -99,16 +102,24 @@ export const StyledButton = styled.button.withConfig({
   ${ButtonStyle}
 `;
 
-const Button: React.FC<ButtonProps> = ({ children, onClick, showToast, toastMessage, ...rest }) => {
+const Button: React.FC<ButtonProps> = ({ children, onClick, showToast, toastMessage, type = "button", ...rest }) => {
+  const { isAuthenticated } = useAuth();
+  const router = useRouter();
+
   const handleClick = () => {
+    if (!isAuthenticated) {
+      router.push("/login");
+      return;
+    }
+
     if (onClick) {
-      onClick(); // Ejecuta la función onClick si está definida
+      onClick();
     }
 
     if (showToast) {
-      toast.success(toastMessage || "Acción completada", { // Muestra el pop-up si showToast es true
-        position: "top-right", // Posición del pop-up
-        autoClose: 2000, // Duración del pop-up (2 segundos)
+      toast.success(toastMessage || "Acción completada", {
+        position: "top-right",
+        autoClose: 2000,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
@@ -118,7 +129,7 @@ const Button: React.FC<ButtonProps> = ({ children, onClick, showToast, toastMess
   };
 
   return (
-    <StyledButton {...rest} onClick={handleClick}>
+    <StyledButton type={type} {...rest} onClick={handleClick}>
       {children}
     </StyledButton>
   );

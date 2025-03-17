@@ -1,4 +1,3 @@
-// app/api/upload-profile-picture/route.ts
 import { NextResponse } from "next/server";
 import aws from "aws-sdk";
 import { v4 as uuidv4 } from "uuid";
@@ -25,7 +24,7 @@ export async function POST(req: Request) {
 
     // Parámetros para subir la imagen a S3
     const params = {
-      Bucket: process.env.AWS_S3_BUCKET_NAME, // Asegúrate de que esta variable esté definida
+      Bucket: process.env.AWS_S3_BUCKET_NAME!, // Asegúrate de que esta variable esté definida
       Key: `profile-pictures/${uuidv4()}.${type}`, // Nombre único para la imagen
       Body: buffer,
       ContentType: file.type,

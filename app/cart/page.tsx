@@ -3,12 +3,10 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import Center from "../components/Center";
 import Header from "../components/Header";
-import Button from "../components/Button";
+import Button from "../components/Button";  // Importación por defecto, ya no es necesario usar 'as StyledButton'
 import { useCart } from "../components/CartContext"; // Usamos el hook `useCart`
 import axios from "axios";
 import Table from "../components/Table";
-import Input from "../components/Input";
-import Footer from "../components/Footer";
 import Swal from 'sweetalert2';
 
 interface Product {
@@ -115,11 +113,11 @@ const Button = styled.button`
   }
 `;
 
+
 export default function CartPage() {
   const { cartProducts, addProduct, removeProduct, clearCart } = useCart();
   const [products, setProducts] = useState<Product[]>([]);
   const [isSuccess, setIsSuccess] = useState(false);
-
 
   useEffect(() => {
     const validCartProducts = cartProducts.filter((id) => id != null); // Filtra null y undefined
@@ -262,14 +260,14 @@ export default function CartPage() {
               </>
             )}
 
-            <Button block="true" onClick={handleClearCart}>
+            <Button block={true} onClick={handleClearCart}>
               Clear Cart
             </Button>
           </Box>
           {!!cartProducts?.length && (
             <Box>
               <h2>Order Information</h2>
-              <Button grey="true" block="true" onClick={handlePurchase}>
+              <Button grey={true} block={true} onClick={handlePurchase}>
                 Continue to payment
               </Button>
             </Box>

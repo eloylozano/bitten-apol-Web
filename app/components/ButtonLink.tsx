@@ -3,10 +3,17 @@ import React from "react";
 import styled from "styled-components";
 import { ButtonStyle } from "./Button";
 
-const StyledLink = styled(Link)`
-  ${ButtonStyle}
+const StyledLink = styled(Link).attrs({
+  passHref: true, // Necesario para propagar el atributo href
+})`
+  ${ButtonStyle} 
 `;
 
-export default function ButtonLink(props) {
-  return <StyledLink {...props} />;
+interface ButtonLinkProps {
+  href: string;
+  [key: string]: any; // Permite pasar otras props como 'className', 'style', etc.
+}
+
+export default function ButtonLink({ href, ...props }: ButtonLinkProps) {
+  return <StyledLink href={href} {...props} />;
 }
