@@ -7,7 +7,7 @@ import CartIcon from "./icons/CartIcon";
 import { CartContext } from "./CartContext";
 import { useContext } from "react";
 import Title from "./Title";
-import Button from "./Button"; // Importa el Button funcional
+import Button from "./StyledButton"; // Importa el Button funcional
 
 const Bg = styled.div`
   background-color: #222;

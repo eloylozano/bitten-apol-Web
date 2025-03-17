@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Button from "../../components/Button";
+import Button from "../../components/StyledButton";
 import { useCart } from "../../components/CartContext";
 import Center from "../../components/Center";
 import Header from "../../components/Header";

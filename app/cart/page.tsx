@@ -3,11 +3,11 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import Center from "../components/Center";
 import Header from "../components/Header";
-import Button from "../components/Button";  // Importación por defecto, ya no es necesario usar 'as StyledButton'
 import { useCart } from "../components/CartContext"; // Usamos el hook `useCart`
 import axios from "axios";
 import Table from "../components/Table";
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
+import StyledButton from "../components/StyledButton";
 
 interface Product {
   _id: string;
@@ -15,9 +15,39 @@ interface Product {
   images: string[];
   price: number;
 }
+
+const RightColumnBox = styled.div`
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* Añadimos más espacio entre los elementos */
+  @media screen and (min-width: 768px) {
+    padding: 30px;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #252525; /* Añadir un borde sutil debajo del título */
+    padding-bottom: 10px;
+  }
+
+  p {
+    font-size: 1rem;
+    color: #666;
+    line-height: 1.6;
+  }
+`;
+
 const ColumnsWrapper = styled.div`
   display: grid;
-  grid-template-columns: 1fr; /* Por defecto, una sola columna */
+  grid-template-columns: 1fr;
   gap: 20px;
   margin-top: 40px;
   @media screen and (min-width: 768px) {
@@ -95,7 +125,7 @@ const MoreLessButton = styled.button`
   border: none;
   border-radius: 5px;
   cursor: pointer;
-`
+`;
 
 const Button = styled.button`
   padding: 10px 20px;
@@ -113,6 +143,11 @@ const Button = styled.button`
   }
 `;
 
+const TitleBox = styled.div`
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 10px;
+`;
 
 export default function CartPage() {
   const { cartProducts, addProduct, removeProduct, clearCart } = useCart();
@@ -152,10 +187,10 @@ export default function CartPage() {
 
     // Muestra el pop-up de SweetAlert2
     Swal.fire({
-      title: '¡Compra realizada con éxito!',
-      text: 'Gracias por tu compra.',
-      icon: 'success',
-      confirmButtonText: 'Aceptar',
+      title: "¡Compra realizada con éxito!",
+      text: "Gracias por tu compra.",
+      icon: "success",
+      confirmButtonText: "Aceptar",
     }).then(() => {
       setIsSuccess(true); // Cambia el estado para mostrar el mensaje de éxito
     });
@@ -163,21 +198,17 @@ export default function CartPage() {
 
   function handleClearCart() {
     Swal.fire({
-      title: 'Are you sure?',
+      title: "Are you sure?",
       text: "You won't be able to revert this!",
-      icon: 'warning',
+      icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, clear it!'
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, clear it!",
     }).then((result) => {
       if (result.isConfirmed) {
         clearCart();
-        Swal.fire(
-          'Cleared!',
-          'Your cart has been cleared.',
-          'success'
-        );
+        Swal.fire("Cleared!", "Your cart has been cleared.", "success");
       }
     });
   }
@@ -210,7 +241,12 @@ export default function CartPage() {
       <Center>
         <ColumnsWrapper>
           <Box>
-            <h2>Cart</h2>
+            <TitleBox>
+              <h2>My Cart</h2>
+              <StyledButton primary size="s" onClick={handleClearCart}>
+                Clear Cart
+              </StyledButton>
+            </TitleBox>
             {cartProducts?.length === 0 ? (
               <div>Your cart is empty</div>
             ) : (
@@ -233,44 +269,59 @@ export default function CartPage() {
                           {product.title}
                         </ProductInfoCell>
                         <td>
-                          <MoreLessButton onClick={() => lessOfThisProduct(product._id)}>
+                          <MoreLessButton
+                            onClick={() => lessOfThisProduct(product._id)}
+                          >
                             -
                           </MoreLessButton>
 
                           <QuantityLabel>
-                            {cartProducts.filter((id) => id === product._id).length}
+                            {
+                              cartProducts.filter((id) => id === product._id)
+                                .length
+                            }
                           </QuantityLabel>
 
-                          <MoreLessButton onClick={() => moreOfThisProduct(product._id)}>
+                          <MoreLessButton
+                            onClick={() => moreOfThisProduct(product._id)}
+                          >
                             +
                           </MoreLessButton>
                         </td>
                         <td>
-                          {cartProducts.filter((id) => id === product._id).length * product.price} €
+                          {cartProducts.filter((id) => id === product._id)
+                            .length * product.price}{" "}
+                          €
                         </td>
                       </tr>
                     ))}
                     <tr>
                       <td></td>
                       <td></td>
-                      <td>{total} €</td>
+                      <td>
+                        <b>{total} €</b>
+                      </td>
                     </tr>
                   </tbody>
                 </Table>
               </>
             )}
-
-            <Button block={true} onClick={handleClearCart}>
-              Clear Cart
-            </Button>
           </Box>
           {!!cartProducts?.length && (
-            <Box>
+            <RightColumnBox>
               <h2>Order Information</h2>
-              <Button grey={true} block={true} onClick={handlePurchase}>
+              <ul>
+                {products.map((product) => (
+                  <li key={product._id}>
+                    {product.title} x
+                    {cartProducts.filter((id) => id === product._id).length}
+                  </li>
+                ))}
+              </ul>
+              <StyledButton primary size="l" onClick={handlePurchase}>
                 Continue to payment
-              </Button>
-            </Box>
+              </StyledButton>
+            </RightColumnBox>
           )}
         </ColumnsWrapper>
       </Center>

@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import Button from "./Button";
+import Button from "./StyledButton";
 import CartIcon from "./icons/CartIcon";
 import Link from "next/link";
 import { primary } from "../lib/colors";

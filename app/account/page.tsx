@@ -9,7 +9,7 @@ import WhiteBox from "../components/WhiteBox";
 import styled from "styled-components";
 import Footer from "../components/Footer";
 import { SyncLoader } from "react-spinners";
-import Button from "../components/Button";
+import Button from "../components/StyledButton";
 
 interface User {
   firstName: string;

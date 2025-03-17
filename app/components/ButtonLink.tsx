@@ -1,7 +1,7 @@
 import Link from "next/link";
 import React from "react";
 import styled from "styled-components";
-import { ButtonStyle } from "./Button";
+import { ButtonStyle } from "./StyledButton";
 
 const StyledLink = styled(Link).attrs({
   passHref: true, // Necesario para propagar el atributo href
