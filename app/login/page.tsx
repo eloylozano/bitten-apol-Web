@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import styled from "styled-components";
 import Button from "../components/Button";
 import Header from "../components/Header";
+import { useAuth } from "../components/AuthContext";
 import Link from "next/link";
 
 const LoginContainer = styled.div`
@@ -66,15 +67,15 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
-
+  const { login } = useAuth(); 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  
+
     if (!email || !password) {
       setError("Por favor, ingresa todos los campos.");
       return;
     }
-  
+
     try {
       const response = await fetch("api/auth/login", {
         method: "POST",
@@ -83,11 +84,12 @@ const Login = () => {
         },
         body: JSON.stringify({ email, password }),
       });
-  
+
       const data = await response.json();
-  
+
       if (response.status === 200) {
         localStorage.setItem("authToken", data.token); // Guarda el token en localStorage
+        login(); // Actualiza el estado de autenticación
         router.push("/"); // Redirige al usuario a la página principal
       } else {
         setError(data.message || "Error en la autenticación.");

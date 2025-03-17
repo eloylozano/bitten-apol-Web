@@ -6,6 +6,7 @@ import Link from "next/link";
 import { primary } from "../lib/colors";
 import { useCart } from "./CartContext"; // Usa useCart en lugar de useContext
 import { useRouter } from "next/navigation";
+import { useAuth } from "./AuthContext";
 
 interface ProductBoxProps {
   _id: string;
@@ -65,18 +66,19 @@ const ProductBox: React.FC<ProductBoxProps> = ({
   images,
 }) => {
   const url = "/product/" + _id;
-  const { addProduct } = useCart(); // Usa useCart para acceder al contexto
+  const { addProduct } = useCart();
+  const { isAuthenticated } = useAuth(); // <-- Aquí usas el contexto
   const router = useRouter();
 
   const handleAddToCart = () => {
-    const isAuthenticated = localStorage.getItem("authToken"); // Verifica si el token existe
     if (!isAuthenticated) {
-      router.push("/login"); // Redirige al usuario a la página de login
+      localStorage.setItem("redirectAfterLogin", JSON.stringify({ action: "addToCart", productId: _id }));
+      router.push("/login");
       return;
     }
-    addProduct(_id); // Si está logueado, añade el producto al carrito
+    addProduct(_id);
   };
-
+  
   return (
     <ProductWrapper>
       <div>
