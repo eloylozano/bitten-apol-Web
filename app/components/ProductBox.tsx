@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import Button from "./StyledButton";
+import StyledButton from "./StyledButton";
 import CartIcon from "./icons/CartIcon";
 import Link from "next/link";
 import { primary } from "../lib/colors";
@@ -92,10 +92,10 @@ const ProductBox: React.FC<ProductBoxProps> = ({
         <Title href={url}>{title}</Title>
         <PriceRow>
           <Price>{price} €</Price>
-          <Button grey={true} onClick={handleAddToCart} outline>
+          <StyledButton grey={true} onClick={handleAddToCart} outline>
             <CartIcon />
             Add to cart
-          </Button>
+          </StyledButton>
         </PriceRow>
       </ProductInfoBox>
     </ProductWrapper>

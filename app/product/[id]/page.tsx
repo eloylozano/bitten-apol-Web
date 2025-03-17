@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Button from "../../components/StyledButton";
+import StyledButton from "../../components/StyledButton";
 import { useCart } from "../../components/CartContext";
 import Center from "../../components/Center";
 import Header from "../../components/Header";
@@ -117,7 +117,7 @@ export default function ProductPage({
                 <Price>{product.price} €</Price>
               </div>
               <div>
-                <Button
+                <StyledButton
                   primary={true}
                   onClick={() => handleAddToCart(product._id)}
                   showToast={true}
@@ -125,7 +125,7 @@ export default function ProductPage({
                 >
                   <CartIcon />{" "}
                   {isAdded ? "Added to cart" : "Add to cart"}
-                </Button>
+                </StyledButton>
               </div>
             </PriceRow>
           </ProductInfo>

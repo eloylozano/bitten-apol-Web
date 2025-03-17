@@ -7,7 +7,7 @@ import CartIcon from "./icons/CartIcon";
 import { CartContext } from "./CartContext";
 import { useContext } from "react";
 import Title from "./Title";
-import Button from "./StyledButton"; // Importa el Button funcional
+import StyledButton from "./StyledButton"; // Importa el Button funcional
 
 const Bg = styled.div`
   background-color: #222;
@@ -87,10 +87,10 @@ export default function Featured({ product }: FeaturedProps) {
                 <ButtonLink href={`/product/${product?._id}`} outline={1} white={1} >
                   Read more
                 </ButtonLink>
-                <Button primary onClick={addFeaturedToCart}>
+                <StyledButton primary onClick={addFeaturedToCart}>
                   <CartIcon />
                   Add to cart
-                </Button>
+                </StyledButton>
               </ButtonsWrapper>
             </div>
           </Column>

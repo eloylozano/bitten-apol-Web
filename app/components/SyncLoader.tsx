@@ -1,7 +1,7 @@
 import React from "react";
 import { SyncLoader } from "react-spinners";
 
-const MyComponent = () => {
+const Loading = () => {
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
@@ -11,18 +11,18 @@ const MyComponent = () => {
   }, []);
 
   return (
-    <div style={{ height: "100vh" }}>
+    <div 
+      style={{ 
+        height: "100vh", 
+        display: "flex", 
+        justifyContent: "center", 
+        alignItems: "center", 
+        margin: 0, 
+        padding: 0,
+      }}
+    >
       {loading ? (
-        <div 
-          style={{
-            display: "flex", 
-            justifyContent: "center", 
-            alignItems: "center", 
-            height: "100vh"
-          }}
-        >
-          <SyncLoader color="#5542F6" loading={loading} size={15} />
-        </div>
+        <SyncLoader color="#5542F6" loading={loading} size={15} />
       ) : (
         <div>Contenido cargado</div>
       )}
@@ -30,4 +30,4 @@ const MyComponent = () => {
   );
 };
 
-export default MyComponent;
+export default Loading;
