@@ -201,11 +201,12 @@ const AccountPage = () => {
       await axios.post("/api/auth/logout");
       localStorage.removeItem("authToken");
       localStorage.removeItem("cart");
-      window.location.href = "/login";
+      window.location.reload();
     } catch (error) {
       console.error("Error during logout:", error);
     }
   };
+  
 
   if (!user) {
     return (
