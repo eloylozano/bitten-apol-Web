@@ -7,6 +7,7 @@ import { primary } from "../lib/colors";
 import { useCart } from "./CartContext"; // Usa useCart en lugar de useContext
 import { useRouter } from "next/navigation";
 import { useAuth } from "./AuthContext";
+import { toast } from 'react-toastify'; // Importa el toast
 
 interface ProductBoxProps {
   _id: string;
@@ -77,6 +78,7 @@ const ProductBox: React.FC<ProductBoxProps> = ({
       return;
     }
     addProduct(_id);
+    toast.success("Producto añadido al carrito"); // Muestra el toast de éxito
   };
   
   return (
