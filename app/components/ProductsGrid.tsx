@@ -1,15 +1,16 @@
 import styled from "styled-components";
 import ProductBox from "./ProductBox";
+import { useState } from "react";
 
 interface Product {
-    _id: string;
-    title: string;
-    description: string;
-    price: number;
+  _id: string;
+  title: string;
+  description: string;
+  price: number;
 }
 
 interface ProductsGridProps {
-    products: Product[];
+  products: Product[];
 }
 
 const StyledProductsGrid = styled.div`
@@ -21,15 +22,42 @@ const StyledProductsGrid = styled.div`
   }
 `;
 
+const SearchInput = styled.input`
+  padding: 10px;
+  width: 100%;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+`;
+
 const ProductsGrid: React.FC<ProductsGridProps> = ({ products }) => {
-    return (
-        <StyledProductsGrid>
-            {products?.length > 0 &&
-                products.map((product) => (
-                    <ProductBox images={[]} key={product._id} {...product} />
-                ))}
-        </StyledProductsGrid>
-    );
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredProducts = products.filter((product) =>
+    product.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  return (
+    <div>
+      <SearchInput
+        type="text"
+        placeholder="Buscar producto..."
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+      />
+
+      <StyledProductsGrid>
+        {filteredProducts.length > 0 ? (
+          filteredProducts.map((product) => (
+            <ProductBox images={[]} key={product._id} {...product} />
+          ))
+        ) : (
+          <p>No se encontraron productos</p>
+        )}
+      </StyledProductsGrid>
+    </div>
+  );
 };
 
 export default ProductsGrid;
