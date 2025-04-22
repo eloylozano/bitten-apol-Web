@@ -104,7 +104,6 @@ export default function Header() {
           <StyledNav id="nav">
             <NavLink href={"/"}>Home</NavLink>
             <NavLink href={"/products"}>Products</NavLink>
-            <NavLink href={"/categories"}>Categories</NavLink>
             <NavLink href={"/cart"}>
               Cart <CartCount>{cartProducts.length}</CartCount>
             </NavLink>

@@ -1,85 +1,66 @@
 import { mongooseConnect } from "@/app/lib/mongoose";
 import { Order } from "@/app/models/Order";
 import { Product } from "@/app/models/Product";
-import { NextApiRequest, NextApiResponse } from "next";
+import { NextResponse } from "next/server";
 
-const stripe = require("stripe")(process.env.STRIPE_SK);
+export async function POST(req: Request) {
+  try {
+    const body = await req.json();
+    const {
+      name,
+      email,
+      city,
+      postalCode,
+      streetAddress,
+      country,
+      cartProducts,
+    } = body;
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-  if (req.method !== "POST") {
-    res.json("should be a POST request");
-    return;
-  }
+    await mongooseConnect();
 
-  // Definir tipos explícitos para los datos de la solicitud
-  const {
-    name,
-    email,
-    city,
-    postalCode,
-    streetAddress,
-    country,
-    cartProducts,
-  }: {
-    name: string;
-    email: string;
-    city: string;
-    postalCode: string;
-    streetAddress: string;
-    country: string;
-    cartProducts: string[]; 
-  } = req.body;
+    const productsIds = cartProducts;
+    const uniqueIds = [...new Set(productsIds)];
+    const productsInfos = await Product.find({ _id: { $in: uniqueIds } });
 
-  await mongooseConnect();
-  
-  const productsIds: string[] = cartProducts;
-  const uniqueIds: string[] = [...new Set(productsIds)];
-  const productsInfos = await Product.find({ _id: { $in: uniqueIds } });
+    let line_items = [];
 
-  let line_items: any[] = [];
+    for (const productId of uniqueIds) {
+      const productInfo = productsInfos.find(
+        (p) => p._id.toString() === productId
+      );
+      const quantity = productsIds.filter((id) => id === productId).length || 0;
 
-  for (const productId of uniqueIds) {
-    const productInfo = productsInfos.find(
-      (p) => p._id.toString() === productId
-    );
-    const quantity = productsIds.filter((id) => id === productId).length || 0;
-
-    if (quantity > 0 && productInfo) {
-      line_items.push({
-        quantity,
-        price_data: {
-          currency: "EUR",
-          product_data: { name: productInfo.title },
-          unit_amount: productInfo.price * 100, 
-        },
-      });
+      if (quantity > 0 && productInfo) {
+        line_items.push({
+          product: productInfo._id,
+          quantity,
+          price: productInfo.price,
+          title: productInfo.title,
+        });
+      }
     }
+
+    const orderDoc = await Order.create({
+      line_items,
+      name,
+      email,
+      city,
+      postalCode,
+      streetAddress,
+      country,
+      paid: false,
+    });
+
+    return NextResponse.json({ 
+      success: true,
+      orderId: orderDoc._id.toString()
+    });
+
+  } catch (error) {
+    console.error('Checkout error:', error);
+    return NextResponse.json(
+      { error: 'Error processing order' },
+      { status: 500 }
+    );
   }
-
-  const orderDoc = await Order.create({
-    line_items,
-    name,
-    email,
-    city,
-    postalCode,
-    streetAddress,
-    country,
-    paid: false,
-  });
-
-  const session = await stripe.checkout.sessions.create({
-    line_items,
-    mode: "payment",
-    customer_email: email,
-    success_url: `${process.env.PUBLIC_URL}/cart?success=1`,
-    cancel_url: `${process.env.PUBLIC_URL}/cart?canceled=1`,
-    metadata: { orderId: orderDoc._id.toString(), test: "ok" },
-  });
-
-  res.json({
-    url: session.url,
-  });
 }

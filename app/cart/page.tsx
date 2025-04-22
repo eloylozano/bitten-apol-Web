@@ -44,31 +44,78 @@ const RightColumnBox = styled.div`
     line-height: 1.6;
   }
 `;
+const StyledTable = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
 
-const ColumnsWrapper = styled.div`
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 20px;
-  margin-top: 40px;
-  @media screen and (min-width: 768px) {
-    grid-template-columns: 1.2fr 0.8fr; /* 2 columnas para pantallas medianas */
+  thead {
+    background-color: #f5f5f5;
   }
-  @media screen and (min-width: 1024px) {
-    grid-template-columns: 1.5fr 1fr; /* Para pantallas grandes */
+
+  th, td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+
+  th {
+    font-weight: 600;
+    color: #333;
+  }
+
+  th:nth-child(1) {
+    width: 50%;
+  }
+
+  th:nth-child(2) {
+    width: 20%;
+    text-align: center;
+  }
+
+  th:nth-child(3) {
+    width: 30%;
+    text-align: right;
+  }
+
+  td:nth-child(2) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  td:nth-child(3) {
+    text-align: right;
   }
 `;
 
 const Box = styled.div`
   background-color: #fff;
   border-radius: 10px;
-  padding: 20px;
+  padding: 30px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   width: 100%;
+  overflow-x: auto;
+
   @media screen and (min-width: 768px) {
-    padding: 30px;
+    padding: 40px;
   }
 `;
 
+const ColumnsWrapper = styled.div`
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 30px;
+  margin-top: 40px;
+
+  @media screen and (min-width: 768px) {
+    grid-template-columns: 1.8fr 1.2fr;
+  }
+
+  @media screen and (min-width: 1024px) {
+    grid-template-columns: 2fr 1fr;
+  }
+`;
 const ProductInfoCell = styled.td`
   padding: 15px 0;
   display: flex;
